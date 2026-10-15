@@ -80,11 +80,12 @@ from spinn_front_end_common.utilities.helpful_functions import (
 
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.models.abstract_models import (
-    AbstractMaxSpikes,
-    ReceivesSynapticInputsOverSDRAM,
-    SendsSynapticInputsOverSDRAM,
-)
+from spynnaker.pyNN.models.abstract_models. \
+    abstract_max_spikes import AbstractMaxSpikes
+from spynnaker.pyNN.models.abstract_models. \
+    receives_synaptic_inputs_over_sdram import ReceivesSynapticInputsOverSDRAM
+from spynnaker.pyNN.models.abstract_models. \
+    sends_synaptic_inputs_over_sdram import SendsSynapticInputsOverSDRAM
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     NUMPY_CONNECTORS_DTYPE,
     ConnectionsArray,

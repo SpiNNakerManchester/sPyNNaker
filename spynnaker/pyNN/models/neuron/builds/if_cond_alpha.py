@@ -17,7 +17,9 @@ from spynnaker.pyNN.models.defaults import (
     AbstractProvidesDefaults,
     default_initial_values,
 )
-from spynnaker.pyNN.models.neuron.implementations import ModelParameter
+from spynnaker.pyNN.models.neuron.implementations.model_parameter import (
+    ModelParameter,
+)
 
 
 class IFCondAlpha(AbstractProvidesDefaults):

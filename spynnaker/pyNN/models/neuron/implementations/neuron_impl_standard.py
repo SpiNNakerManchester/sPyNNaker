@@ -20,14 +20,15 @@ from spinn_utilities.ranged.range_dictionary import RangeDictionary
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
-from spynnaker.pyNN.models.neuron.additional_inputs import (
-    AbstractAdditionalInput,
-)
-from spynnaker.pyNN.models.neuron.input_types import (
+from spynnaker.pyNN.models.neuron.additional_inputs. \
+    abstract_additional_input import AbstractAdditionalInput
+from spynnaker.pyNN.models.neuron.input_types.abstract_input_type import (
     AbstractInputType,
+)
+from spynnaker.pyNN.models.neuron.input_types.input_type_conductance import (
     InputTypeConductance,
 )
-from spynnaker.pyNN.models.neuron.neuron_models import NeuronModel
+from spynnaker.pyNN.models.neuron.neuron_models.neuron_model import NeuronModel
 from spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type import (
     AbstractSynapseType,
 )

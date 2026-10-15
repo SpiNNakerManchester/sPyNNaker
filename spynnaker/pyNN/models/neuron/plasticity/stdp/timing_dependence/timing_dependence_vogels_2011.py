@@ -30,12 +30,10 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     float_to_fixed,
     get_exp_lut_array,
 )
-from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
-    SynapseStructureWeightOnly,
-)
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
-    AbstractTimingDependence,
-)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure. \
+    synapse_structure_weight_only import SynapseStructureWeightOnly
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence. \
+    abstract_timing_dependence import AbstractTimingDependence
 
 
 class TimingDependenceVogels2011(AbstractTimingDependence):

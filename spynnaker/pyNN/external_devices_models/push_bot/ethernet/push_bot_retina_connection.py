@@ -21,10 +21,11 @@ from spinnman.connections import ConnectionListener
 from spinn_front_end_common.utilities.connections import LiveEventConnection
 from spinn_front_end_common.utilities.constants import BYTES_PER_SHORT
 
-from spynnaker.pyNN.connections import SpynnakerLiveSpikesConnection
-from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
-    PushBotRetinaResolution,
-)
+from spynnaker.pyNN.connections.spynnaker_live_spikes_connection import (
+    SpynnakerLiveSpikesConnection,
+    )
+from spynnaker.pyNN.external_devices_models.push_bot.parameters. \
+    push_bot_retina_resolution import PushBotRetinaResolution
 
 from .push_bot_wifi_connection import PushBotWIFIConnection
 

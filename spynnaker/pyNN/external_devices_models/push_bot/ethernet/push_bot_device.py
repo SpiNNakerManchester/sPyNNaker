@@ -17,14 +17,16 @@ from decimal import Decimal
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.overrides import overrides
 
-from spynnaker.pyNN.external_devices_models import (
-    AbstractMulticastControllableDevice,
-    SendType,
-)
-from spynnaker.pyNN.external_devices_models.push_bot import (
-    AbstractPushBotOutputDevice,
-)
-from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
+from spynnaker.pyNN.external_devices_models. \
+    abstract_multicast_controllable_device import (
+        AbstractMulticastControllableDevice,
+        SendType,
+    )
+from spynnaker.pyNN.external_devices_models.push_bot. \
+    abstract_push_bot_output_device import AbstractPushBotOutputDevice
+from spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol import (
+    MunichIoSpiNNakerLinkProtocol,
+    )
 
 # The default timestep to use for first send.  Avoids clashes with other
 # control commands.

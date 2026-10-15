@@ -35,9 +35,8 @@ from spynnaker.pyNN.exceptions import (
     InvalidParameterType,
     SynapticConfigurationException,
 )
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractConnector,
-)
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    abstract_connector import AbstractConnector
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.\
     abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (

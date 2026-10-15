@@ -24,9 +24,8 @@ from spinn_utilities.overrides import overrides
 
 from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamics,
-)
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    abstract_synapse_dynamics import AbstractSynapseDynamics
 from spynnaker.pyNN.spynnaker_types import WeightsDelysIn
 
 if TYPE_CHECKING:

@@ -14,9 +14,8 @@
 
 from spinn_utilities.abstract_base import AbstractBase
 
-from spynnaker.pyNN.models.neuron.implementations import (
-    AbstractStandardNeuronComponent,
-)
+from spynnaker.pyNN.models.neuron.implementations. \
+    abstract_standard_neuron_component import AbstractStandardNeuronComponent
 
 
 # pylint: disable=abstract-method

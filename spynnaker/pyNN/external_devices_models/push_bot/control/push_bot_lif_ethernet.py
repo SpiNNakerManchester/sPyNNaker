@@ -13,14 +13,16 @@
 # limitations under the License.
 
 
-from spynnaker.pyNN.external_devices_models import (
-    AbstractMulticastControllableDevice,
-    ExternalDeviceLifControl,
-)
-from spynnaker.pyNN.external_devices_models.push_bot.ethernet import (
-    PushBotTranslator,
-    get_pushbot_wifi_connection,
-)
+from spynnaker.pyNN.external_devices_models. \
+    abstract_multicast_controllable_device import (
+        AbstractMulticastControllableDevice,
+        )
+from spynnaker.pyNN.external_devices_models. \
+    external_device_lif_control import ExternalDeviceLifControl
+from spynnaker.pyNN.external_devices_models.push_bot. \
+    ethernet.push_bot_translator import PushBotTranslator
+from spynnaker.pyNN.external_devices_models.push_bot.ethernet. \
+    push_bot_wifi_connection import get_pushbot_wifi_connection
 from spynnaker.pyNN.models.defaults import default_initial_values
 from spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol import (
     MunichIoSpiNNakerLinkProtocol,

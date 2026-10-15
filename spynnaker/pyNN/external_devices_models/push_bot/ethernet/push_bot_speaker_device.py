@@ -24,7 +24,9 @@ from spinn_front_end_common.utility_models import MultiCastCommand
 
 from spynnaker.pyNN.external_devices_models.push_bot.parameters. \
     push_bot_speaker import PushBotSpeaker
-from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
+from spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol import (
+    MunichIoSpiNNakerLinkProtocol,
+    )
 
 from .push_bot_device import PushBotEthernetDevice
 

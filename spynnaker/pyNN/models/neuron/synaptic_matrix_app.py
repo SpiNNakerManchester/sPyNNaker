@@ -29,12 +29,12 @@ from spinn_front_end_common.utilities.helpful_functions import (
 )
 
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractGenerateConnectorOnHost,
-)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamicsStructural,
-)
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    abstract_generate_connector_on_host import AbstractGenerateConnectorOnHost
+from spynnaker.pyNN.models.neuron. \
+    synapse_dynamics.abstract_synapse_dynamics_structural import (
+        AbstractSynapseDynamicsStructural,
+    )
 from spynnaker.pyNN.spynnaker_types import WeightScales
 
 from .generator_data import GeneratorData

@@ -46,10 +46,14 @@ from spinn_front_end_common.interface.profiling import profile_utils
 from spinn_front_end_common.utilities.constants import SYSTEM_BYTES_REQUIREMENT
 
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
-from spynnaker.pyNN.models.abstract_models import SupportsStructure
-from spynnaker.pyNN.models.common import (
+from spynnaker.pyNN.models.abstract_models.supports_structure import (
+    SupportsStructure,
+)
+from spynnaker.pyNN.models.common.multi_spike_recorder import (
     MultiSpikeRecorder,
-    ParameterHolder,
+)
+from spynnaker.pyNN.models.common.parameter_holder import ParameterHolder
+from spynnaker.pyNN.models.common.population_application_vertex import (
     PopulationApplicationVertex,
 )
 from spynnaker.pyNN.models.common.types import Names

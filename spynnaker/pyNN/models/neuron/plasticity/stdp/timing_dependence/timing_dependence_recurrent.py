@@ -30,9 +30,10 @@ from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     STDP_FIXED_POINT_ONE,
 )
-from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
-    SynapseStructureWeightAccumulator,
-)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure. \
+    synapse_structure_weight_accumulator import (
+        SynapseStructureWeightAccumulator,
+    )
 
 from .abstract_timing_dependence import AbstractTimingDependence
 

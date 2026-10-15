@@ -14,12 +14,14 @@
 
 from collections.abc import Iterable
 
-from spynnaker.pyNN.external_devices_models import ExternalDeviceLifControl
-from spynnaker.pyNN.external_devices_models.push_bot.ethernet import (
-    PushBotEthernetDevice,
-)
+from spynnaker.pyNN.external_devices_models. \
+    external_device_lif_control import ExternalDeviceLifControl
+from spynnaker.pyNN.external_devices_models.push_bot.ethernet. \
+    push_bot_device import PushBotEthernetDevice
 from spynnaker.pyNN.models.defaults import default_initial_values
-from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
+from spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol import (
+    MunichIoSpiNNakerLinkProtocol,
+    )
 
 
 class PushBotLifSpinnakerLink(ExternalDeviceLifControl):

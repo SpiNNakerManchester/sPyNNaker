@@ -41,10 +41,13 @@ from spynnaker.pyNN.models.common.population_application_vertex import (
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch,
 )
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamicsStructural,
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    abstract_synapse_dynamics_structural import (
+        AbstractSynapseDynamicsStructural,
+    )
+from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
+    SpikeSourcePoissonVertex,
 )
-from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
 from spynnaker.pyNN.spynnaker_types import WeightScales
 from spynnaker.pyNN.utilities.bit_field_utilities import (
     get_bitfield_key_map_data,

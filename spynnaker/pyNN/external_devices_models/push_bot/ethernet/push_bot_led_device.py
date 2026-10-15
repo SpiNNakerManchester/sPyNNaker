@@ -22,10 +22,11 @@ from spinn_front_end_common.abstract_models import (
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utility_models import MultiCastCommand
 
-from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
-    PushBotLED,
-)
-from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
+from spynnaker.pyNN.external_devices_models.push_bot. \
+    parameters.push_bot_led import PushBotLED
+from spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol import (
+    MunichIoSpiNNakerLinkProtocol,
+    )
 
 from .push_bot_device import PushBotEthernetDevice
 

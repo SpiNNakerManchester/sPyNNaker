@@ -39,7 +39,9 @@ from spinn_front_end_common.interface.ds import (
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
-from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
+from spynnaker.pyNN.models.neuron.local_only.abstract_local_only import (
+    AbstractLocalOnly,
+)
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
