@@ -35,7 +35,7 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.common import PopulationApplicationVertex
     from spynnaker.pyNN.models.common.types import Names
     from spynnaker.pyNN.models.populations import Population
-    from spynnaker.pyNN.types import IoDest
+    from spynnaker.pyNN.spynnaker_types import IoDest
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

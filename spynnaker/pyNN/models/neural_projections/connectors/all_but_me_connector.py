@@ -27,7 +27,7 @@ from pacman.model.graphs.common import Slice
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
-from spynnaker.pyNN.types import Weights
+from spynnaker.pyNN.spynnaker_types import Weights
 
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (

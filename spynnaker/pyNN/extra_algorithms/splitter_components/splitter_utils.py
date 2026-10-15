@@ -26,7 +26,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic,
 )
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
-from spynnaker.pyNN.types import Delays
+from spynnaker.pyNN.spynnaker_types import Delays
 
 
 def is_direct_poisson_source(
