@@ -42,7 +42,12 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spynnaker.pyNN.types import Delays, Weights, WeightsDelays, is_scalar
+from spynnaker.pyNN.spynnaker_types import (
+    Delays,
+    Weights,
+    WeightsDelays,
+    is_scalar,
+)
 from spynnaker.pyNN.utilities import utility_calls
 
 if TYPE_CHECKING:

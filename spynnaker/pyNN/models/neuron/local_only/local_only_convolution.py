@@ -53,7 +53,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSupportsSignedWeights,
 )
-from spynnaker.pyNN.types import WeightsDelysIn
+from spynnaker.pyNN.spynnaker_types import WeightsDelysIn
 
 from .abstract_local_only import AbstractLocalOnly
 

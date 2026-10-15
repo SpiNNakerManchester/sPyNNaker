@@ -70,7 +70,7 @@ from spynnaker.pyNN.utilities.random_stats. \
     random_stats_vonmises_impl import RandomStatsVonmisesImpl
 
 if TYPE_CHECKING:
-    from spynnaker.pyNN.types import IoDest
+    from spynnaker.pyNN.spynnaker_types import IoDest
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

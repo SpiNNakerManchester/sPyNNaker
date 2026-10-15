@@ -45,7 +45,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural,
 )
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
-from spynnaker.pyNN.types import WeightScales
+from spynnaker.pyNN.spynnaker_types import WeightScales
 from spynnaker.pyNN.utilities.bit_field_utilities import (
     get_bitfield_key_map_data,
     get_sdram_for_bit_field_region,

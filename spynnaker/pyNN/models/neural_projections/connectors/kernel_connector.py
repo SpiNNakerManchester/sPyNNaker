@@ -39,7 +39,7 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spynnaker.pyNN.types import Delays, Weights, WeightsDelays
+from spynnaker.pyNN.spynnaker_types import Delays, Weights, WeightsDelays
 
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (

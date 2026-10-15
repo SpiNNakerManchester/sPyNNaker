@@ -33,7 +33,12 @@ from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     NUMPY_CONNECTORS_DTYPE as CONNECTOR_DTYPE,
 )
-from spynnaker.pyNN.types import Delays, Weights, WeightsDelysIn, is_scalar
+from spynnaker.pyNN.spynnaker_types import (
+    Delays,
+    Weights,
+    WeightsDelysIn,
+    is_scalar,
+)
 from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 
 if TYPE_CHECKING:

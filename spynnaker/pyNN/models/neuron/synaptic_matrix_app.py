@@ -35,7 +35,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural,
 )
-from spynnaker.pyNN.types import WeightScales
+from spynnaker.pyNN.spynnaker_types import WeightScales
 
 from .generator_data import GeneratorData
 from .synapse_io import convert_to_connections, get_synapses, read_all_synapses

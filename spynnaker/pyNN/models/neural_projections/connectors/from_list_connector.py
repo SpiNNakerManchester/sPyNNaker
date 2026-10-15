@@ -37,7 +37,7 @@ from pacman.model.graphs.machine import MachineVertex
 
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.exceptions import InvalidParameterType
-from spynnaker.pyNN.types import Delays, Weights, WeightsDelays
+from spynnaker.pyNN.spynnaker_types import Delays, Weights, WeightsDelays
 
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (

@@ -27,7 +27,7 @@ from spinn_front_end_common.interface.ds import DataSpecificationGenerator
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamics,
 )
-from spynnaker.pyNN.types import WeightsDelysIn
+from spynnaker.pyNN.spynnaker_types import WeightsDelysIn
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron import (

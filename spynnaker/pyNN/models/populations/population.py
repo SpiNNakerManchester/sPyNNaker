@@ -51,7 +51,7 @@ from spynnaker.pyNN.models.common.population_application_vertex import (
     PopulationApplicationVertex,
     )
 from spynnaker.pyNN.models.recorder import Recorder
-from spynnaker.pyNN.types import Selector
+from spynnaker.pyNN.spynnaker_types import Selector
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.utility_calls import get_neo_io
 
@@ -63,7 +63,7 @@ if TYPE_CHECKING:
 
     from spynnaker.pyNN.models.common.parameter_holder import ParameterHolder
     from spynnaker.pyNN.models.common.types import Names, Values
-    from spynnaker.pyNN.types import IoDest
+    from spynnaker.pyNN.spynnaker_types import IoDest
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _CellType: TypeAlias = AbstractPyNNModel | PopulationApplicationVertex

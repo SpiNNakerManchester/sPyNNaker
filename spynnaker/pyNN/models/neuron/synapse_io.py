@@ -39,7 +39,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     NUMPY_CONNECTORS_DTYPE,
     ConnectionsArray,
 )
-from spynnaker.pyNN.types import WeightScales
+from spynnaker.pyNN.spynnaker_types import WeightScales
 
 from .master_pop_table import MasterPopTableAsBinarySearch
 
