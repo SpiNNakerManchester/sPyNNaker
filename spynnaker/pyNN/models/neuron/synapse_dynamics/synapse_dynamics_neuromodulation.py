@@ -38,8 +38,8 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     NUMPY_CONNECTORS_DTYPE,
 )
-from spynnaker.pyNN.types import WeightScales
-from spynnaker.pyNN.types import WeightsDelysIn as _Weight
+from spynnaker.pyNN.spynnaker_types import WeightScales
+from spynnaker.pyNN.spynnaker_types import WeightsDelysIn as _Weight
 
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine,

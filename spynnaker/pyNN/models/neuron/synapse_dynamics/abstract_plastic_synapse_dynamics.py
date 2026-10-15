@@ -20,7 +20,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     ConnectionsArray,
 )
-from spynnaker.pyNN.types import WeightScales
+from spynnaker.pyNN.spynnaker_types import WeightScales
 
 from .abstract_sdram_synapse_dynamics import AbstractSDRAMSynapseDynamics
 

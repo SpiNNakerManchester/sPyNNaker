@@ -39,7 +39,7 @@ if TYPE_CHECKING:
     from pyNN.neuron.standardmodels.electrodes import NeuronCurrentSource
 
     from spynnaker.pyNN.models.common.types import Names
-    from spynnaker.pyNN.types import IoDest
+    from spynnaker.pyNN.spynnaker_types import IoDest
 
     from .population_view import IDMixin
 

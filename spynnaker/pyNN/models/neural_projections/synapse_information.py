@@ -28,7 +28,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractGenerateOnMachine,
 )
-from spynnaker.pyNN.types import Delays, Weights
+from spynnaker.pyNN.spynnaker_types import Delays, Weights
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 if TYPE_CHECKING:

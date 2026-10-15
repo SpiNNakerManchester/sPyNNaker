@@ -26,7 +26,7 @@ from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationVertex
 
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.types import WeightsDelysIn as _In_Types
+from spynnaker.pyNN.spynnaker_types import WeightsDelysIn as _In_Types
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
@@ -74,7 +74,7 @@ if TYPE_CHECKING:
     from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
         ConnectionsArray,
     )
-    from spynnaker.pyNN.types import Delays
+    from spynnaker.pyNN.spynnaker_types import Delays
 
     from .synapse_dynamics_structural_common import ConnectionsInfo
 

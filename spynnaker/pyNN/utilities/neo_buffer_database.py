@@ -55,7 +55,7 @@ from spinn_front_end_common.utility_models import (
 
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spynnaker.pyNN.types import ViewIndices
+from spynnaker.pyNN.spynnaker_types import ViewIndices
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.constants import SPIKES
 from spynnaker.pyNN.utilities.neo_csv import DATE_FORMAT, NeoCsv
