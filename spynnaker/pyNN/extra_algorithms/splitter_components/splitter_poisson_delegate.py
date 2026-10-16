@@ -25,7 +25,9 @@ from pacman.model.partitioner_splitters import (
 from pacman.model.resources import AbstractSDRAM
 from pacman.utilities.utility_objs import ChipCounter
 
-from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
+from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
+    SpikeSourcePoissonVertex,
+)
 
 from .abstract_supports_one_to_one_sdram_input import (
     AbstractSupportsOneToOneSDRAMInput,

@@ -23,7 +23,9 @@ from spinn_front_end_common.interface.provenance import (
     ProvenanceWriter,
 )
 
-from spynnaker.pyNN.models.neuron import PopulationMachineVertex
+from spynnaker.pyNN.models.neuron.population_machine_vertex import (
+    PopulationMachineVertex,
+    )
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

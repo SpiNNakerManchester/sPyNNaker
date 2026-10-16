@@ -43,11 +43,15 @@ from spinn_utilities.overrides import overrides
 
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spynnaker.pyNN.models.abstract_models import SupportsStructure
+from spynnaker.pyNN.models.abstract_models.supports_structure import (
+    SupportsStructure,
+)
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
-from spynnaker.pyNN.models.common import PopulationApplicationVertex
+from spynnaker.pyNN.models.common.population_application_vertex import (
+    PopulationApplicationVertex,
+    )
 from spynnaker.pyNN.models.recorder import Recorder
 from spynnaker.pyNN.spynnaker_types import Selector
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase

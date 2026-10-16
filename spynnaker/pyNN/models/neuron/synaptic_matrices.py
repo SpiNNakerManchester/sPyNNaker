@@ -34,15 +34,20 @@ from pacman.utilities.utility_calls import allocator_bits_needed
 from spinn_front_end_common.interface.ds import DataSpecificationBase, DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
-from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.common import PopulationApplicationVertex
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
+from spynnaker.pyNN.models.common.population_application_vertex import (
+    PopulationApplicationVertex,
+    )
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch,
 )
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamicsStructural,
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    abstract_synapse_dynamics_structural import (
+        AbstractSynapseDynamicsStructural,
+    )
+from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
+    SpikeSourcePoissonVertex,
 )
-from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
 from spynnaker.pyNN.spynnaker_types import WeightScales
 from spynnaker.pyNN.utilities.bit_field_utilities import (
     get_bitfield_key_map_data,

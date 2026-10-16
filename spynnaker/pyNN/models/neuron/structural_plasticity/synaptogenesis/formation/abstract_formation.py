@@ -16,9 +16,8 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractHasParameterNames,
-)
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    abstract_has_parameter_names import AbstractHasParameterNames
 
 
 class AbstractFormation(AbstractHasParameterNames, metaclass=AbstractBase):

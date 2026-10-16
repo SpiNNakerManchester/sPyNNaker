@@ -32,10 +32,12 @@ from spinn_front_end_common.utilities.constants import (
 )
 
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractConnector,
-    AbstractGenerateConnectorOnMachine,
-)
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    abstract_connector import AbstractConnector
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    abstract_generate_connector_on_machine import (
+        AbstractGenerateConnectorOnMachine,
+    )
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     NUMPY_CONNECTORS_DTYPE,
 )

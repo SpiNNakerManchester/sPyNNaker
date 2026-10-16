@@ -15,9 +15,8 @@ from collections.abc import Sequence
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
-from spynnaker.pyNN.models.neuron.implementations import (
-    AbstractStandardNeuronComponent,
-)
+from spynnaker.pyNN.models.neuron.implementations. \
+    abstract_standard_neuron_component import AbstractStandardNeuronComponent
 
 
 class AbstractSynapseType(

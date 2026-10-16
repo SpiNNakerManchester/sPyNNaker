@@ -25,7 +25,7 @@ if TYPE_CHECKING:
         ProjectionApplicationEdge,
         SynapseInformation,
     )
-    from spynnaker.pyNN.models.neuron import PopulationVertex
+    from spynnaker.pyNN.models.neuron.population_vertex import PopulationVertex
     from spynnaker.pyNN.models.utility_models.delays import (
         DelayExtensionVertex,
     )

@@ -25,9 +25,13 @@ from spinn_front_end_common.abstract_models import HasCustomAtomKeyMap
 from spinn_front_end_common.interface.ds import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
-from spynnaker.pyNN.models.abstract_models import ColouredApplicationVertex
+from spynnaker.pyNN.models.abstract_models.coloured_application_vertex import (
+    ColouredApplicationVertex,
+)
 from spynnaker.pyNN.models.common.parameter_holder import ParameterHolder
-from spynnaker.pyNN.models.current_sources import AbstractCurrentSource
+from spynnaker.pyNN.models.current_sources.abstract_current_source import (
+    AbstractCurrentSource,
+)
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 
 from .types import Names, Values

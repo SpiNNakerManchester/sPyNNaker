@@ -38,7 +38,7 @@ from spinn_front_end_common.interface.provenance import (
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import SIMULATION_N_BYTES
 
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 
 from .delay_extension_vertex import DelayExtensionVertex
 

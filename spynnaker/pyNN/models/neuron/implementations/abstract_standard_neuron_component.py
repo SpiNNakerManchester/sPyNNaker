@@ -18,7 +18,9 @@ from pyNN.random import RandomDistribution
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.ranged import RangeDictionary, RangedList
 
-from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
+from spynnaker.pyNN.utilities.ranged.spynnaker_ranged_list import (
+    SpynnakerRangedList,
+)
 from spynnaker.pyNN.utilities.struct import Struct
 
 from .model_parameter import ModelParameter

@@ -32,9 +32,8 @@ from spynnaker.pyNN.models.common.param_generator_data import (
     param_generator_params,
     param_generator_params_size_in_bytes,
 )
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractConnector,
-)
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    abstract_connector import AbstractConnector
 from spynnaker.pyNN.spynnaker_types import Delays, Weights
 from spynnaker.pyNN.utilities.utility_calls import check_rng
 

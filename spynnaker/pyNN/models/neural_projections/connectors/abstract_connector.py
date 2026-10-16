@@ -40,7 +40,7 @@ from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.spynnaker_types import (
     Delays,

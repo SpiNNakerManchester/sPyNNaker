@@ -21,19 +21,21 @@ from pacman.model.graphs.application import (
     ApplicationEdgePartition,
 )
 
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.exceptions import DelayExtensionException
-from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    AbstractSpynnakerSplitterDelay,
-    SplitterDelayVertexSlice,
-)
-from spynnaker.pyNN.models.neural_projections import (
-    DelayAfferentApplicationEdge,
-    DelayedApplicationEdge,
-    ProjectionApplicationEdge,
-)
-from spynnaker.pyNN.models.neuron import PopulationVertex
-from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
+from spynnaker.pyNN.extra_algorithms.splitter_components. \
+    abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
+from spynnaker.pyNN.extra_algorithms.splitter_components. \
+    splitter_delay_vertex_slice import SplitterDelayVertexSlice
+from spynnaker.pyNN.models.neural_projections. \
+    delay_afferent_application_edge import DelayAfferentApplicationEdge
+from spynnaker.pyNN.models.neural_projections. \
+    delayed_application_edge import DelayedApplicationEdge
+from spynnaker.pyNN.models.neural_projections. \
+    projection_application_edge import ProjectionApplicationEdge
+from spynnaker.pyNN.models.neuron.population_vertex import PopulationVertex
+from spynnaker.pyNN.models.utility_models. \
+    delays.delay_extension_vertex import DelayExtensionVertex
 
 
 def delay_support_adder() -> tuple[

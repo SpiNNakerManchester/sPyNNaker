@@ -13,8 +13,9 @@
 # limitations under the License.
 from spinn_utilities.progress_bar import ProgressBar
 
-from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
+from spynnaker.pyNN.models.neural_projections. \
+    projection_application_edge import ProjectionApplicationEdge
 
 
 def finish_connection_holders() -> None:
