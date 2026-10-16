@@ -21,13 +21,14 @@ from spinn_utilities.config_holder import get_config_bool
 
 from pacman.model.graphs.application import ApplicationVertex
 
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractConnector,
-    AbstractGenerateConnectorOnMachine,
-)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractGenerateOnMachine,
-)
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    abstract_connector import AbstractConnector
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    abstract_generate_connector_on_machine import (
+            AbstractGenerateConnectorOnMachine,
+    )
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    abstract_generate_on_machine import AbstractGenerateOnMachine
 from spynnaker.pyNN.spynnaker_types import Delays, Weights
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 

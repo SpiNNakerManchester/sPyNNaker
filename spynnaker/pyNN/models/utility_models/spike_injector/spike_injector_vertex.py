@@ -29,9 +29,13 @@ from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
-from spynnaker.pyNN.models.abstract_models import SupportsStructure
-from spynnaker.pyNN.models.common import (
+from spynnaker.pyNN.models.abstract_models.supports_structure import (
+    SupportsStructure,
+)
+from spynnaker.pyNN.models.common.eieio_spike_recorder import (
     EIEIOSpikeRecorder,
+)
+from spynnaker.pyNN.models.common.population_application_vertex import (
     PopulationApplicationVertex,
 )
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType

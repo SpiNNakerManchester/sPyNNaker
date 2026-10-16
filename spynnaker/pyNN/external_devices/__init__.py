@@ -115,9 +115,8 @@ from spynnaker.pyNN.models.populations.population import (
     Population,
     _CellTypeArg,
 )
-from spynnaker.pyNN.models.utility_models.spike_injector import (
-    SpikeInjector as ExternalDeviceSpikeInjector,
-)
+from spynnaker.pyNN.models.utility_models.spike_injector. \
+    spike_injector import SpikeInjector as ExternalDeviceSpikeInjector
 from spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol import (
     MunichIoSpiNNakerLinkProtocol,
 )

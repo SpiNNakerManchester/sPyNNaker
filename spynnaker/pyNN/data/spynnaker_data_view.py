@@ -21,7 +21,7 @@ from spinn_utilities.log import FormatAdapter
 
 from spinn_front_end_common.data import FecDataView
 
-from spynnaker import _version
+from spynnaker._version import NAME
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.populations import Population
@@ -235,4 +235,4 @@ class SpynnakerDataView(FecDataView):
         """
         :returns: The name to be returned by `pyNN.spiNNaker.name`.
         """
-        return _version.NAME
+        return NAME
