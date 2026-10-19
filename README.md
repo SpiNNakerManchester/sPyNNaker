@@ -3,6 +3,7 @@
 [![C Actions](https://github.com/SpiNNakerManchester/sPyNNaker/actions/workflows/c_actions.yml/badge.svg)](https://github.com/SpiNNakerManchester/sPyNNaker/actions/workflows/c_actions.yml)
 [![Documentation Status](https://readthedocs.org/projects/spynnaker/badge/?version=latest)](https://spynnaker.readthedocs.io/en/latest)
 
+
 sPyNNaker - PyNN Simulations on SpiNNaker Hardware
 ==================================================
 This package provides common code for PyNN implementations for SpiNNaker.
