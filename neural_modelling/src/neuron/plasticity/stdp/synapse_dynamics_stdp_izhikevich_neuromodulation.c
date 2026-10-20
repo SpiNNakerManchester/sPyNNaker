@@ -336,13 +336,9 @@ void synapse_dynamics_print_plastic_synapses(
         uint32_t synapse_type = synapse_row_sparse_type(
                 control_word, synapse_index_bits, synapse_type_mask);
 
-        // Get weight
-        fixed_stdp_synapse s = synapse_dynamics_stdp_get_fixed(
-                control_word, time, 0);
-
         // Create update state from the plastic synaptic word
         nm_update_state_t current_state = get_nm_update_state(
-                *plastic_words++, s.type);
+                *plastic_words++, synapse_type);
         nm_final_state_t final_state = get_nm_final_state(current_state);
         weight_t weight = final_state.weight;
 
