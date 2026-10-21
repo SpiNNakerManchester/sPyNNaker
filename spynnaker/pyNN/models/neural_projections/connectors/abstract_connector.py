@@ -736,7 +736,7 @@ class AbstractConnector(metaclass=AbstractBase):
         """
         Returns a human-readable description of the connection method.
 
-        The output may be customized by specifying a different template
+        The output may be customised by specifying a different template
         together with an associated template engine (see pyNN.descriptions).
 
         If template is None,

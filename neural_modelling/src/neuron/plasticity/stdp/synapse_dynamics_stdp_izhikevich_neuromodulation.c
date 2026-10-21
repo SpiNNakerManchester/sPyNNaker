@@ -104,7 +104,7 @@ static inline nm_final_state_t get_nm_final_state(
     nm_final_state_t final_state = {
         .weight=(weight_t) (bitsk(update_state.weight) >> update_state.weight_shift),
         .final_state=synapse_structure_get_final_state(
-                update_state.eligibility_state, 0.0k)
+                update_state.eligibility_state)
     };
     return final_state;
 }
@@ -323,25 +323,24 @@ void synapse_dynamics_print_plastic_synapses(
 #if LOG_LEVEL >= LOG_DEBUG
     // Extract separate arrays of weights (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
-    const plastic_synapse_t *plastic_words = plastic_region_data->synapses;
+    neuromodulated_synapse_t *plastic_words = plastic_region_data->synapses;
     const control_t *control_words = synapse_row_plastic_controls(fixed_region);
-    size_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
+    size_t n_plastic_synapses = synapse_row_num_plastic_controls(fixed_region);
 
-    log_debug("Plastic region %u synapses\n", plastic_synapse);
+    log_debug("Plastic region %u synapses\n", n_plastic_synapses);
 
     // Loop through plastic synapses
-    for (uint32_t i = 0; i < plastic_synapse; i++) {
+    for (uint32_t i = 0; i < n_plastic_synapses; i++) {
         // Get next control word (auto incrementing control word)
         uint32_t control_word = *control_words++;
         uint32_t synapse_type = synapse_row_sparse_type(
                 control_word, synapse_index_bits, synapse_type_mask);
 
-        // Get weight
-        update_state_t update_state = synapse_structure_get_update_state(
+        // Create update state from the plastic synaptic word
+        nm_update_state_t current_state = get_nm_update_state(
                 *plastic_words++, synapse_type);
-        final_state_t final_state = synapse_structure_get_final_state(
-                update_state, 0.0k);
-        weight_t weight = synapse_structure_get_final_weight(final_state);
+        nm_final_state_t final_state = get_nm_final_state(current_state);
+        weight_t weight = final_state.weight;
 
         log_debug("%08x [%3d: (w: %5u (=", control_word, i, weight);
         synapses_print_weight(
