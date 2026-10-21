@@ -15,3 +15,6 @@
 # We use a single exception files for all the main repsitories
 # It can be found at:
 # https://github.com/SpiNNakerManchester/SupportScripts/blob/master/actions/pylint/default_dict.txt
+Eprop
+eprop
+Perrett

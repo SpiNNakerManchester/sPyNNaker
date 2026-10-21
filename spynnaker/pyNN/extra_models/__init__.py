@@ -12,78 +12,60 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spynnaker.pyNN.models.neural_projections.connectors. \
-    all_but_me_connector import AllButMeConnector
-from spynnaker.pyNN.models.neural_projections.connectors. \
-    one_to_one_offset_connector import OneToOneOffsetConnector
-from spynnaker.pyNN.models.neuron.builds.if_cond_exp_stoc import (
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    AllButMeConnector,
+    OneToOneOffsetConnector,
+)
+from spynnaker.pyNN.models.neuron.builds import (
     IFCondExpStoc,
-)
-from spynnaker.pyNN.models.neuron.builds.if_curr_delta import (
-    IFCurrDelta as IFCurDelta,
-)
-from spynnaker.pyNN.models.neuron.builds.if_curr_delta_ca2_adaptive import (
     IFCurrDeltaCa2Adaptive,
-)
-from spynnaker.pyNN.models.neuron.builds.if_curr_delta_fixed_prob import (
     IFCurrDeltaFixedProb,
+    IFCurrExpCa2Adaptive,
+    IFTruncDelta,
+    StocExp,
+    StocExpStable,
+    StocSigma,
 )
-from spynnaker.pyNN.models.neuron.builds.if_curr_dual_exp_base import (
+from spynnaker.pyNN.models.neuron.builds import IFCurrDelta as IFCurDelta
+from spynnaker.pyNN.models.neuron.builds import (
     IFCurrDualExpBase as IF_curr_dual_exp,
 )
-from spynnaker.pyNN.models.neuron.builds.if_curr_exp_ca2_adaptive import (
-    IFCurrExpCa2Adaptive,
-)
-from spynnaker.pyNN.models.neuron.builds.if_curr_exp_semd_base import (
+from spynnaker.pyNN.models.neuron.builds import (
     IFCurrExpSEMDBase as IF_curr_exp_sEMD,
 )
-from spynnaker.pyNN.models.neuron.builds.if_trunc_delta import (
-    IFTruncDelta,
-)
-from spynnaker.pyNN.models.neuron.builds.izk_cond_dual_exp_base import (
+from spynnaker.pyNN.models.neuron.builds import (
     IzkCondDualExpBase as Izhikevich_cond_dual,
 )
-from spynnaker.pyNN.models.neuron.builds.izk_cond_exp_base import (
+from spynnaker.pyNN.models.neuron.builds import (
     IzkCondExpBase as Izhikevich_cond,
 )
-from spynnaker.pyNN.models.neuron.builds.stoc_exp import StocExp
-from spynnaker.pyNN.models.neuron.builds.stoc_exp_stable import StocExpStable
-from spynnaker.pyNN.models.neuron.builds.stoc_sigma import StocSigma
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence. \
-    timing_dependence_pfister_spike_triplet import (
-        TimingDependencePfisterSpikeTriplet as PfisterSpikeTriplet,
-    )
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence. \
-    timing_dependence_recurrent import (
-        TimingDependenceRecurrent as RecurrentRule,
-    )
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence. \
-    timing_dependence_spike_nearest_pair import (
-        TimingDependenceSpikeNearestPair as SpikeNearestPairRule,
-    )
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence. \
-    timing_dependence_vogels_2011 import (
-        TimingDependenceVogels2011 as Vogels2011Rule,
-    )
-from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence. \
-    weight_dependence_additive_triplet import WeightDependenceAdditiveTriplet
-from spynnaker.pyNN.models.neuron.synapse_dynamics. \
-    synapse_dynamics_neuromodulation import (
-        SynapseDynamicsNeuromodulation as Neuromodulation,
-    )
-from spynnaker.pyNN.models.neuron.synapse_dynamics. \
-    synapse_dynamics_weight_changable import (
-        SynapseDynamicsWeightChangable as WeightChangeable,
-    )
-from spynnaker.pyNN.models.neuron.synapse_dynamics. \
-    synapse_dynamics_weight_changer import (
-        SynapseDynamicsWeightChanger as WeightChanger,
-    )
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
+    TimingDependencePfisterSpikeTriplet as PfisterSpikeTriplet,
+)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
+    TimingDependenceRecurrent as RecurrentRule,
+)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
+    TimingDependenceSpikeNearestPair as SpikeNearestPairRule,
+)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
+    TimingDependenceVogels2011 as Vogels2011Rule,
+)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
+    WeightDependenceAdditiveTriplet,
+)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    SynapseDynamicsNeuromodulation as Neuromodulation,
+)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    SynapseDynamicsWeightChangable as WeightChangeable,
+)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    SynapseDynamicsWeightChanger as WeightChanger,
+)
 
 # Variable rate poisson
-from spynnaker.pyNN.models.spike_source.spike_source_poisson_variable import (
-    SpikeSourcePoissonVariable,
-)
+from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVariable
 
 __all__ = [  # noqa: RUF022
     # sPyNNaker models not currently part of full pyNN

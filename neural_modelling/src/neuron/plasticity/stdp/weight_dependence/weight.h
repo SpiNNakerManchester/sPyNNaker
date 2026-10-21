@@ -61,9 +61,10 @@ static weight_state_t weight_get_initial(weight_t weight, index_t synapse_type);
 /*!
  * \brief Gets the final weight.
  * \param[in] new_state: The updated weight state
+ * \param[in] reg_error: The regularisation error
  * \return The new weight.
  */
-static weight_t weight_get_final(weight_state_t new_state);
+static weight_t weight_get_final(weight_state_t new_state, REAL reg_error);
 
 /*!
  * \brief Decay the weight inside the state by multiplication
