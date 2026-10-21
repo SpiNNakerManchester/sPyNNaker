@@ -28,7 +28,9 @@ from spinn_front_end_common.abstract_models import (
     AbstractVertexWithEdgeToDependentVertices,
 )
 
-from spynnaker.pyNN.models.common import PopulationApplicationVertex
+from spynnaker.pyNN.models.common.population_application_vertex import (
+    PopulationApplicationVertex,
+    )
 from spynnaker.pyNN.models.defaults import AbstractProvidesDefaults
 
 from .machine_munich_motor_device import MachineMunichMotorDevice

@@ -65,49 +65,62 @@ from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT,
 )
 
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.exceptions import (
     SpynnakerException,
     SynapticConfigurationException,
 )
-from spynnaker.pyNN.models.abstract_models import (
-    AbstractAcceptsIncomingSynapses,
+from spynnaker.pyNN.models.abstract_models. \
+    abstract_accepts_incoming_synapses import AbstractAcceptsIncomingSynapses
+from spynnaker.pyNN.models.abstract_models.abstract_max_spikes import (
     AbstractMaxSpikes,
-    HasSynapses,
+)
+from spynnaker.pyNN.models.abstract_models.has_synapses import HasSynapses
+from spynnaker.pyNN.models.abstract_models.supports_structure import (
     SupportsStructure,
 )
-from spynnaker.pyNN.models.common import (
-    NeuronRecorder,
-    ParameterHolder,
-    PopulationApplicationVertex,
-)
+from spynnaker.pyNN.models.common.neuron_recorder import NeuronRecorder
 from spynnaker.pyNN.models.common.param_generator_data import (
     MAX_PARAMS_BYTES,
     is_param_generatable,
 )
-from spynnaker.pyNN.models.common.types import Names, Values
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractGenerateConnectorOnMachine,
+from spynnaker.pyNN.models.common.parameter_holder import ParameterHolder
+from spynnaker.pyNN.models.common.population_application_vertex import (
+    PopulationApplicationVertex,
 )
-from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
+from spynnaker.pyNN.models.common.types import Names, Values
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    abstract_generate_connector_on_machine import (
+        AbstractGenerateConnectorOnMachine,
+    )
+from spynnaker.pyNN.models.neuron.local_only.abstract_local_only import (
+    AbstractLocalOnly,
+)
 from spynnaker.pyNN.models.neuron.population_machine_common import (
     CommonRegions,
 )
 from spynnaker.pyNN.models.neuron.population_machine_neurons import (
     NeuronRegions,
 )
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractGenerateOnMachine,
-    AbstractSDRAMSynapseDynamics,
-    AbstractSupportsSignedWeights,
-    AbstractSynapseDynamics,
-    AbstractSynapseDynamicsStructural,
-    SynapseDynamicsStatic,
-)
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    abstract_generate_on_machine import AbstractGenerateOnMachine
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    abstract_sdram_synapse_dynamics import AbstractSDRAMSynapseDynamics
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    abstract_supports_signed_weights import AbstractSupportsSignedWeights
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    abstract_synapse_dynamics import AbstractSynapseDynamics
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    abstract_synapse_dynamics_structural import (
+        AbstractSynapseDynamicsStructural,
+    )
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    synapse_dynamics_static import SynapseDynamicsStatic
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     NUMPY_CONNECTORS_DTYPE,
 )
-from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
+from spynnaker.pyNN.models.spike_source. \
+    spike_source_poisson import SpikeSourcePoissonVertex
 from spynnaker.pyNN.utilities.bit_field_utilities import get_sdram_for_keys
 from spynnaker.pyNN.utilities.buffer_data_type import BufferDataType
 from spynnaker.pyNN.utilities.constants import (
@@ -450,9 +463,10 @@ class PopulationVertex(
                 "it cannot be reset. Please fix and try again.")
         # Circularity
         # pylint: disable=import-outside-toplevel
-        from spynnaker.pyNN.extra_algorithms.splitter_components import (
-            SplitterPopulationVertex as ValidSplitter,
-        )
+        from spynnaker.pyNN.extra_algorithms.splitter_components. \
+            splitter_population_vertex import (
+                SplitterPopulationVertex as ValidSplitter,
+            )
         if not isinstance(splitter, ValidSplitter):
             raise PacmanConfigurationException(
                 f"The splitter object on {self._label} must be set to one "

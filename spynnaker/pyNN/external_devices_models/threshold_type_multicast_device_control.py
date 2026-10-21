@@ -19,10 +19,12 @@ from spinn_utilities.ranged.range_dictionary import RangeDictionary
 
 from spinn_front_end_common.interface.ds import DataType
 
-from spynnaker.pyNN.external_devices_models import (
-    AbstractMulticastControllableDevice,
-)
-from spynnaker.pyNN.models.neuron.threshold_types import AbstractThresholdType
+from spynnaker.pyNN.external_devices_models. \
+    abstract_multicast_controllable_device import (
+        AbstractMulticastControllableDevice,
+    )
+from spynnaker.pyNN.models.neuron.threshold_types. \
+    abstract_threshold_type import AbstractThresholdType
 from spynnaker.pyNN.utilities.struct import Struct
 
 _DEVICE = "device"

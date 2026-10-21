@@ -22,12 +22,12 @@ from numpy.typing import NDArray
 
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractGenerateConnectorOnMachine,
-)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractGenerateOnMachine,
-)
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    abstract_generate_connector_on_machine import (
+        AbstractGenerateConnectorOnMachine,
+    )
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    abstract_generate_on_machine import AbstractGenerateOnMachine
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections import (

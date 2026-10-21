@@ -22,8 +22,10 @@ from spinn_utilities.ranged import RangeDictionary
 from spinn_front_end_common.interface.ds import DataType
 
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
-from spynnaker.pyNN.models.neuron.implementations import (
+from spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl import (
     AbstractNeuronImpl,
+)
+from spynnaker.pyNN.models.neuron.implementations.model_parameter import (
     ModelParameter,
 )
 from spynnaker.pyNN.random_distribution import RandomDistribution

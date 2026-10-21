@@ -13,19 +13,20 @@
 # limitations under the License.
 from pacman.model.graphs.application import ApplicationVertex
 
-from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterPoissonDelegate,
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
+from spynnaker.pyNN.extra_algorithms.splitter_components. \
+    splitter_poisson_delegate import SplitterPoissonDelegate
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    abstract_connector import AbstractConnector
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    one_to_one_connector import OneToOneConnector
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    abstract_synapse_dynamics import AbstractSynapseDynamics
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    synapse_dynamics_static import SynapseDynamicsStatic
+from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
+    SpikeSourcePoissonVertex,
 )
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractConnector,
-    OneToOneConnector,
-)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamics,
-    SynapseDynamicsStatic,
-)
-from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
 from spynnaker.pyNN.spynnaker_types import Delays
 
 

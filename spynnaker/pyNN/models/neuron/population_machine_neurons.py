@@ -40,15 +40,19 @@ from spinn_front_end_common.interface.ds import (
 )
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 
-from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.abstract_models import AbstractNeuronExpandable
-from spynnaker.pyNN.models.current_sources import CurrentSourceIDs
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
+from spynnaker.pyNN.models.abstract_models.abstract_neuron_expandable import (
+    AbstractNeuronExpandable,
+)
+from spynnaker.pyNN.models.current_sources.abstract_current_source import (
+    CurrentSourceIDs,
+)
 from spynnaker.pyNN.utilities.utility_calls import convert_to, get_n_bits
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.current_sources import AbstractCurrentSource
-    from spynnaker.pyNN.models.neuron import PopulationVertex
     from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
+    from spynnaker.pyNN.models.neuron.population_vertex import PopulationVertex
 
 
 class NeuronProvenance(ctypes.LittleEndianStructure):

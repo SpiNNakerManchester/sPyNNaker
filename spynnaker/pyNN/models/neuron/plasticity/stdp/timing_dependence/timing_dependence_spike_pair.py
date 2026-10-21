@@ -25,13 +25,12 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD,
 )
 
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     get_exp_lut_array,
 )
-from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
-    SynapseStructureWeightOnly,
-)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure. \
+    synapse_structure_weight_only import SynapseStructureWeightOnly
 
 from .abstract_timing_dependence import AbstractTimingDependence
 

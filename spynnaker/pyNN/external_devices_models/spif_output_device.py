@@ -35,8 +35,10 @@ from spinn_front_end_common.utility_models import MultiCastCommand
 from spinn_front_end_common.utility_models.command_sender import CommandSender
 
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
-from spynnaker.pyNN.models.common import PopulationApplicationVertex
-from spynnaker.pyNN.models.populations import Population
+from spynnaker.pyNN.models.common.population_application_vertex import (
+    PopulationApplicationVertex,
+    )
+from spynnaker.pyNN.models.populations.population import Population
 from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
     SpynnakerExternalDevicePluginManager,
 )

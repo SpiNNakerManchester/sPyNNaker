@@ -23,7 +23,9 @@ from spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model import (
 from spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model import (
     _population_parameters as APNM_default_params,
 )
-from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
+from spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard import (
+    NeuronImplStandard,
+)
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.extra_algorithms.splitter_components import (

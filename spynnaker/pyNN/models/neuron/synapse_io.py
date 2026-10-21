@@ -25,16 +25,16 @@ from pacman.model.graphs.common import Slice
 
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SynapseRowTooBigException
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractConnector,
-)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractPlasticSynapseDynamics,
-    AbstractSDRAMSynapseDynamics,
-    AbstractStaticSynapseDynamics,
-)
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    abstract_connector import AbstractConnector
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    abstract_sdram_synapse_dynamics import AbstractSDRAMSynapseDynamics
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     NUMPY_CONNECTORS_DTYPE,
     ConnectionsArray,

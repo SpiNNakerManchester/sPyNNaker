@@ -35,7 +35,9 @@ from spinn_front_end_common.utilities.constants import (
 )
 
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.models.abstract_models import ColouredApplicationVertex
+from spynnaker.pyNN.models.abstract_models.coloured_application_vertex import (
+    ColouredApplicationVertex,
+)
 from spynnaker.pyNN.models.common.local_only_2d_common import (
     BITS_PER_SHORT,
     KEY_INFO_SIZE,
@@ -46,13 +48,12 @@ from spynnaker.pyNN.models.common.local_only_2d_common import (
     get_rinfo_for_spike_source,
     get_sources_for_target,
 )
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractConnector,
-    ConvolutionConnector,
-)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSupportsSignedWeights,
-)
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    abstract_connector import AbstractConnector
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    convolution_connector import ConvolutionConnector
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    abstract_supports_signed_weights import AbstractSupportsSignedWeights
 from spynnaker.pyNN.spynnaker_types import WeightsDelysIn
 
 from .abstract_local_only import AbstractLocalOnly

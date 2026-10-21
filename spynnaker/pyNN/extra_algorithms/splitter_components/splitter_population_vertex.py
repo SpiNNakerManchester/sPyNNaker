@@ -25,7 +25,7 @@ from pacman.model.partitioner_splitters import AbstractSplitterCommon
 from pacman.utilities.algorithm_utilities\
     .partition_algorithm_utilities import get_multidimensional_slices
 
-from spynnaker.pyNN.models.neuron import PopulationVertex
+from spynnaker.pyNN.models.neuron.population_vertex import PopulationVertex
 
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 

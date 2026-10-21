@@ -14,10 +14,13 @@
 
 
 from spynnaker.pyNN.models.defaults import default_parameters
-from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
-from spynnaker.pyNN.models.neuron.implementations import (
+from spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model import (
+    AbstractPyNNNeuronModel,
+)
+from spynnaker.pyNN.models.neuron.implementations. \
+    neuron_impl_stoc_exp_stable import NeuronImplStocExpStable
+from spynnaker.pyNN.models.neuron.implementations.model_parameter import (
     ModelParameter,
-    NeuronImplStocExpStable,
 )
 
 

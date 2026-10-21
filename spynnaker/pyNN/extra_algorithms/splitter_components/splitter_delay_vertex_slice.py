@@ -32,10 +32,10 @@ from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT,
 )
 
-from spynnaker.pyNN.models.utility_models.delays import (
-    DelayExtensionMachineVertex,
-    DelayExtensionVertex,
-)
+from spynnaker.pyNN.models.utility_models.delays. \
+    delay_extension_machine_vertex import DelayExtensionMachineVertex
+from spynnaker.pyNN.models.utility_models.delays. \
+    delay_extension_vertex import DelayExtensionVertex
 
 
 class SplitterDelayVertexSlice(AbstractSplitterCommon[DelayExtensionVertex]):

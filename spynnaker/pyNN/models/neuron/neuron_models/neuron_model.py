@@ -12,9 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from spynnaker.pyNN.models.neuron.implementations import (
-    AbstractStandardNeuronComponent,
-)
+from spynnaker.pyNN.models.neuron.implementations. \
+    abstract_standard_neuron_component import AbstractStandardNeuronComponent
 
 
 class NeuronModel(AbstractStandardNeuronComponent):

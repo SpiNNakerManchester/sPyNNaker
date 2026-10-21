@@ -20,12 +20,13 @@ from spinn_utilities.overrides import overrides
 
 from spinn_front_end_common.utility_models import MultiCastCommand
 
-from spynnaker.pyNN.external_devices_models import AbstractEthernetTranslator
-from spynnaker.pyNN.protocols import (
+from spynnaker.pyNN.external_devices_models. \
+    abstract_ethernet_translator import AbstractEthernetTranslator
+from spynnaker.pyNN.protocols.munich_io_ethernet_protocol import (
     MunichIoEthernetProtocol,
-    munich_io_spinnaker_link_protocol,
-)
+    )
 from spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol import (
+    GET_RETINA_PAYLOAD_VALUE,
     MunichIoSpiNNakerLinkProtocol,
 )
 
@@ -79,8 +80,7 @@ class PushBotTranslator(AbstractEthernetTranslator):
             logger.debug("Sending retina enable")
             self.__pushbot_wifi_connection.send(
                 MunichIoEthernetProtocol.set_retina_transmission(
-                    munich_io_spinnaker_link_protocol.GET_RETINA_PAYLOAD_VALUE(
-                        multicast_packet.payload or 0)))
+                    GET_RETINA_PAYLOAD_VALUE(multicast_packet.payload or 0)))
             self.__pushbot_wifi_connection.send(
                 MunichIoEthernetProtocol.enable_retina())
 

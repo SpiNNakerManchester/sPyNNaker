@@ -13,17 +13,25 @@
 # limitations under the License.
 
 from spynnaker.pyNN.models.defaults import default_initial_values
-from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
-from spynnaker.pyNN.models.neuron.additional_inputs import (
-    AdditionalInputCa2Adaptive,
+from spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard import (
+    AbstractPyNNNeuronModelStandard,
 )
-from spynnaker.pyNN.models.neuron.implementations import ModelParameter
-from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
-from spynnaker.pyNN.models.neuron.neuron_models import (
-    NeuronModelLeakyIntegrateAndFire,
+from spynnaker.pyNN.models.neuron.additional_inputs. \
+    additional_input_ca2_adaptive import AdditionalInputCa2Adaptive
+from spynnaker.pyNN.models.neuron.implementations.model_parameter import (
+    ModelParameter,
 )
-from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeExponential
-from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
+from spynnaker.pyNN.models.neuron.input_types.input_type_current import (
+    InputTypeCurrent,
+)
+from spynnaker.pyNN.models.neuron.neuron_models. \
+    neuron_model_leaky_integrate_and_fire import (
+        NeuronModelLeakyIntegrateAndFire,
+    )
+from spynnaker.pyNN.models.neuron.synapse_types. \
+    synapse_type_exponential import SynapseTypeExponential
+from spynnaker.pyNN.models.neuron.threshold_types. \
+    threshold_type_static import ThresholdTypeStatic
 
 
 class IFCurrExpCa2Adaptive(AbstractPyNNNeuronModelStandard):

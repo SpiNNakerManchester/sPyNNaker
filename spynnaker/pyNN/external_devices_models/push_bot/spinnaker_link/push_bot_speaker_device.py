@@ -15,14 +15,16 @@
 
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 
-from spynnaker.pyNN.external_devices_models.push_bot.ethernet import (
-    PushBotEthernetSpeakerDevice,
-)
-from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
-    PushBotSpeaker,
-)
-from spynnaker.pyNN.models.common import PopulationApplicationVertex
-from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
+from spynnaker.pyNN.external_devices_models.push_bot.ethernet. \
+    push_bot_speaker_device import PushBotEthernetSpeakerDevice
+from spynnaker.pyNN.external_devices_models.push_bot.parameters. \
+    push_bot_speaker import PushBotSpeaker
+from spynnaker.pyNN.models.common.population_application_vertex import (
+    PopulationApplicationVertex,
+    )
+from spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol import (
+    MunichIoSpiNNakerLinkProtocol,
+    )
 
 
 class PushBotSpiNNakerLinkSpeakerDevice(
