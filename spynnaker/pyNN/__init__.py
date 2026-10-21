@@ -69,43 +69,62 @@ from spynnaker._version import (  # NOQA
     __version_year__,
 )
 from spynnaker.pyNN import external_devices, extra_models
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
 # current sources
 # noinspection PyUnresolvedReferences
-from spynnaker.pyNN.models.current_sources import (
-    ACSource,
-    DCSource,
+from spynnaker.pyNN.models.current_sources.ac_source import ACSource
+from spynnaker.pyNN.models.current_sources.dc_source import DCSource
+from spynnaker.pyNN.models.current_sources.noisy_current_source import (
     NoisyCurrentSource,
+)
+from spynnaker.pyNN.models.current_sources.step_current_source import (
     StepCurrentSource,
 )
 
 # connections
 # noinspection PyUnresolvedReferences
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractConnector,
-    AllToAllConnector,
-    ArrayConnector,
-    ConvolutionConnector,
-    CSAConnector,
-    DistanceDependentProbabilityConnector,
-    FixedNumberPostConnector,
-    FixedNumberPreConnector,
-    FixedProbabilityConnector,
-    FromFileConnector,
-    FromListConnector,
-    IndexBasedProbabilityConnector,
-    KernelConnector,
-    OneToOneConnector,
-    PoolDenseConnector,
-    SmallWorldConnector,
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    abstract_connector import AbstractConnector
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    all_to_all_connector import AllToAllConnector
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    array_connector import ArrayConnector
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    convolution_connector import ConvolutionConnector
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    csa_connector import CSAConnector
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    distance_dependent_probability_connector import (
+        DistanceDependentProbabilityConnector,
+    )
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    fixed_number_post_connector import FixedNumberPostConnector
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    fixed_number_pre_connector import FixedNumberPreConnector
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    fixed_probability_connector import FixedProbabilityConnector
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    from_file_connector import FromFileConnector
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    from_list_connector import FromListConnector
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    index_based_probability_connector import IndexBasedProbabilityConnector
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    kernel_connector import KernelConnector
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    multapse_connector import MultapseConnector as FixedTotalNumberConnector
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    one_to_one_connector import OneToOneConnector
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    pool_dense_connector import PoolDenseConnector
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    small_world_connector import SmallWorldConnector
+from spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model import (
+    AbstractPyNNNeuronModel,
 )
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    MultapseConnector as FixedTotalNumberConnector,
-)
-from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
 
 # neuron stuff
 # noinspection PyUnresolvedReferences
@@ -134,54 +153,58 @@ from spynnaker.pyNN.models.neuron.builds.izk_curr_exp_base import (
 )
 
 # local-only synapses
-from spynnaker.pyNN.models.neuron.local_only import (
+from spynnaker.pyNN.models.neuron.local_only.local_only_convolution import (
     LocalOnlyConvolution as Convolution,
 )
-from spynnaker.pyNN.models.neuron.local_only import (
+from spynnaker.pyNN.models.neuron.local_only.local_only_pool_dense import (
     LocalOnlyPoolDense as PoolDense,
 )
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
-    TimingDependenceSpikePair as SpikePairRule,
-)
-from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
-    WeightDependenceAdditive as AdditiveWeightDependence,
-)
-from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
-    WeightDependenceMultiplicative as MultiplicativeWeightDependence,
-)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence. \
+    timing_dependence_spike_pair import (
+        TimingDependenceSpikePair as SpikePairRule,
+    )
+from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence. \
+    weight_dependence_additive import (
+        WeightDependenceAdditive as AdditiveWeightDependence,
+    )
+from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence. \
+    weight_dependence_multiplicative import (
+        WeightDependenceMultiplicative as MultiplicativeWeightDependence,
+    )
 from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
-    .elimination import RandomByWeightElimination
+    .elimination.random_by_weight_elimination import RandomByWeightElimination
 from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
-    .formation import DistanceDependentFormation
+    .formation.distance_dependent_formation import DistanceDependentFormation
 from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
-    .partner_selection import LastNeuronSelection, RandomSelection
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamics,
-)
+    .partner_selection.last_neuron_selection import LastNeuronSelection
+from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis \
+    .partner_selection.random_selection import RandomSelection
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    abstract_synapse_dynamics import AbstractSynapseDynamics
 
 # synapse structures
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    SynapseDynamicsStatic as StaticSynapse,
-)
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    synapse_dynamics_static import SynapseDynamicsStatic as StaticSynapse
 
 # plastic stuff
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    SynapseDynamicsSTDP as STDPMechanism,
-)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    SynapseDynamicsStructuralStatic as StructuralMechanismStatic,
-)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    SynapseDynamicsStructuralSTDP as StructuralMechanismSTDP,
-)
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    synapse_dynamics_stdp import SynapseDynamicsSTDP as STDPMechanism
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    synapse_dynamics_structural_static import (
+        SynapseDynamicsStructuralStatic as StructuralMechanismStatic,
+    )
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    synapse_dynamics_structural_stdp import (
+        SynapseDynamicsStructuralSTDP as StructuralMechanismSTDP,
+    )
 
 # pops
 # noinspection PyUnresolvedReferences
-from spynnaker.pyNN.models.populations import (
-    Assembly,
+from spynnaker.pyNN.models.populations.assembly import Assembly
+from spynnaker.pyNN.models.populations.population import Population
+from spynnaker.pyNN.models.populations.population_base import PopulationBase
+from spynnaker.pyNN.models.populations.population_view import (
     IDMixin,
-    Population,
-    PopulationBase,
     PopulationView,
 )
 

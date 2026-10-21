@@ -30,7 +30,7 @@ if TYPE_CHECKING:
         ProjectionApplicationEdge,
         SynapseInformation,
     )
-    from spynnaker.pyNN.models.neuron import PopulationVertex
+    from spynnaker.pyNN.models.neuron.population_vertex import PopulationVertex
     from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
         .elimination import AbstractElimination
     from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\

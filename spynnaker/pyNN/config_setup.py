@@ -23,7 +23,9 @@ from spinn_front_end_common.interface.config_setup import (
 )
 
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
-from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModel
+from spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model import (
+    AbstractPyNNNeuronModel,
+)
 
 SPYNNAKER_CFG = "spynnaker.cfg"
 

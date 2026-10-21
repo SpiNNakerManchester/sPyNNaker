@@ -16,14 +16,16 @@ from typing import Any
 
 from spinn_utilities.overrides import overrides
 
-from spynnaker.pyNN.external_devices_models import AbstractEthernetSensor
-from spynnaker.pyNN.external_devices_models.push_bot import (
-    AbstractPushBotRetinaDevice,
-)
-from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
-    PushBotRetinaResolution,
-)
-from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
+from spynnaker.pyNN.external_devices_models.abstract_ethernet_sensor import (
+    AbstractEthernetSensor,
+    )
+from spynnaker.pyNN.external_devices_models.push_bot. \
+    abstract_push_bot_retina_device import AbstractPushBotRetinaDevice
+from spynnaker.pyNN.external_devices_models.push_bot.parameters. \
+    push_bot_retina_resolution import PushBotRetinaResolution
+from spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol import (
+    MunichIoSpiNNakerLinkProtocol,
+    )
 
 from .push_bot_retina_connection import PushBotRetinaConnection
 from .push_bot_translator import PushBotTranslator

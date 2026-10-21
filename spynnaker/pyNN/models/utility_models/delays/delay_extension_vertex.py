@@ -27,11 +27,13 @@ from pacman.model.graphs.application import (
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 from spynnaker.pyNN.exceptions import DelayExtensionException
-from spynnaker.pyNN.models.abstract_models import (
-    AbstractHasDelayStages,
-    ColouredApplicationVertex,
+from spynnaker.pyNN.models.abstract_models. \
+    abstract_has_delay_stages import AbstractHasDelayStages
+from spynnaker.pyNN.models.abstract_models. \
+    coloured_application_vertex import ColouredApplicationVertex
+from spynnaker.pyNN.models.neural_projections.delayed_application_edge import (
+    DelayedApplicationEdge,
 )
-from spynnaker.pyNN.models.neural_projections import DelayedApplicationEdge
 from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 
 if TYPE_CHECKING:

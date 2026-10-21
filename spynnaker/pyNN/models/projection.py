@@ -40,24 +40,26 @@ from pacman.model.graphs.application import ApplicationVertex
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker._version import __version__
-from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.abstract_models import (
-    AbstractAcceptsIncomingSynapses,
-)
-from spynnaker.pyNN.models.neural_projections import (
-    ProjectionApplicationEdge,
-    SynapseInformation,
-)
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    FromListConnector,
-)
-from spynnaker.pyNN.models.neuron import ConnectionHolder, PopulationVertex
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractHasParameterNames,
-    SynapseDynamicsStatic,
-)
-from spynnaker.pyNN.models.populations import Population, PopulationView
-from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
+from spynnaker.pyNN.models.abstract_models. \
+    abstract_accepts_incoming_synapses import AbstractAcceptsIncomingSynapses
+from spynnaker.pyNN.models.neural_projections. \
+    projection_application_edge import ProjectionApplicationEdge
+from spynnaker.pyNN.models.neural_projections. \
+    synapse_information import SynapseInformation
+from spynnaker.pyNN.models.neural_projections.connectors. \
+    from_list_connector import FromListConnector
+from spynnaker.pyNN.models.neuron.connection_holder import ConnectionHolder
+from spynnaker.pyNN.models.neuron.population_vertex import PopulationVertex
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    abstract_has_parameter_names import AbstractHasParameterNames
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    synapse_dynamics_static import SynapseDynamicsStatic
+from spynnaker.pyNN.models.populations.population import Population
+from spynnaker.pyNN.models.populations.population_view import PopulationView
+from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
+    SpikeSourcePoissonVertex,
+    )
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections.connectors import (

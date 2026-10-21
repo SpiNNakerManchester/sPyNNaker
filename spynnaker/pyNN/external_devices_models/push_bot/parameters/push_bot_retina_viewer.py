@@ -22,10 +22,11 @@ from matplotlib import pyplot
 from spinn_utilities.log import FormatAdapter
 
 from spynnaker.pyNN import external_devices
-from spynnaker.pyNN.connections import SpynnakerLiveSpikesConnection
-from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
-    PushBotRetinaResolution,
-)
+from spynnaker.pyNN.connections.spynnaker_live_spikes_connection import (
+    SpynnakerLiveSpikesConnection,
+    )
+from spynnaker.pyNN.external_devices_models.push_bot. \
+    parameters.push_bot_retina_resolution import PushBotRetinaResolution
 
 _logger = FormatAdapter(logging.getLogger(__name__))
 MAX_VALUE = 33.0

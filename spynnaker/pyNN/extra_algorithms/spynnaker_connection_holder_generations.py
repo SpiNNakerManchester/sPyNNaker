@@ -17,11 +17,12 @@ from spinn_utilities.progress_bar import ProgressBar
 
 from pacman.model.graphs.application import ApplicationGraph
 
-from spynnaker.pyNN.models.neural_projections import (
-    ProjectionApplicationEdge,
-    SynapseInformation,
-)
-from spynnaker.pyNN.models.neuron import ConnectionHolder
+from spynnaker.pyNN.models.neural_projections. \
+    projection_application_edge import ProjectionApplicationEdge
+from spynnaker.pyNN.models.neural_projections. \
+    synapse_information import SynapseInformation
+from spynnaker.pyNN.models.neuron. \
+    connection_holder import ConnectionHolder
 
 
 class SpYNNakerConnectionHolderGenerator:

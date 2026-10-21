@@ -19,15 +19,17 @@ from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 
 from spinn_front_end_common.utility_models import MultiCastCommand
 
-from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.external_devices_models.push_bot import (
-    AbstractPushBotRetinaDevice,
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
+from spynnaker.pyNN.external_devices_models.push_bot. \
+    abstract_push_bot_retina_device import AbstractPushBotRetinaDevice
+from spynnaker.pyNN.external_devices_models.push_bot.parameters. \
+    push_bot_retina_resolution import PushBotRetinaResolution
+from spynnaker.pyNN.models.common.population_application_vertex import (
+    PopulationApplicationVertex,
+    )
+from spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol import (
+    MunichIoSpiNNakerLinkProtocol,
 )
-from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
-    PushBotRetinaResolution,
-)
-from spynnaker.pyNN.models.common import PopulationApplicationVertex
-from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 

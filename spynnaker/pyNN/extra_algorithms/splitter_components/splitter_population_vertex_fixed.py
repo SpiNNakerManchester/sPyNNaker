@@ -32,30 +32,34 @@ from pacman.utilities.utility_objs import ChipCounter
 from spynnaker.pyNN.models.common.population_application_vertex import (
     PopulationApplicationVertex,
 )
-from spynnaker.pyNN.models.neuron import (
-    LocalOnlyProvenance,
-    PopulationMachineLocalOnlyCombinedVertex,
-    PopulationMachineVertex,
-)
-from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
-from spynnaker.pyNN.models.neuron.master_pop_table import (
-    MasterPopTableAsBinarySearch,
-)
-from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
-from spynnaker.pyNN.models.neuron.population_machine_common import (
-    PopulationMachineCommon,
-)
-from spynnaker.pyNN.models.neuron.population_machine_vertex import (
-    MainProvenance,
-    NeuronProvenance,
-    SpikeProcessingProvenance,
-    SynapseProvenance,
-)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamicsStructural,
-)
+from spynnaker.pyNN.models.neuron. \
+    local_only.abstract_local_only import AbstractLocalOnly
+from spynnaker.pyNN.models.neuron. \
+    master_pop_table import MasterPopTableAsBinarySearch
+from spynnaker.pyNN.models.neuron. \
+    neuron_data import NeuronData
+from spynnaker.pyNN.models.neuron. \
+    population_machine_common import PopulationMachineCommon
+from spynnaker.pyNN.models.neuron. \
+    population_machine_local_only_combined_vertex import (
+        LocalOnlyProvenance,
+        PopulationMachineLocalOnlyCombinedVertex,
+    )
+from spynnaker.pyNN.models.neuron. \
+    population_machine_vertex import (
+        MainProvenance,
+        NeuronProvenance,
+        PopulationMachineVertex,
+        SpikeProcessingProvenance,
+        SynapseProvenance,
+    )
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    abstract_synapse_dynamics_structural import (
+        AbstractSynapseDynamicsStructural,
+    )
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
-from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
+from spynnaker.pyNN.models.utility_models.delays. \
+    delay_extension_vertex import DelayExtensionVertex
 from spynnaker.pyNN.utilities.bit_field_utilities import (
     get_sdram_for_bit_field_region,
 )

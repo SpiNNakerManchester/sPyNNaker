@@ -20,7 +20,9 @@ from spinn_utilities.ranged import RangeDictionary
 
 from spinn_front_end_common.interface.ds import DataType
 
-from spynnaker.pyNN.models.neuron.implementations import ModelParameter
+from spynnaker.pyNN.models.neuron.implementations.model_parameter import (
+    ModelParameter,
+)
 from spynnaker.pyNN.random_distribution import RandomDistribution
 from spynnaker.pyNN.utilities.struct import Struct
 

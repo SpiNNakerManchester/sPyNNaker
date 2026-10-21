@@ -20,7 +20,8 @@ from spinn_front_end_common.abstract_models import (
 from spinn_front_end_common.utilities.constants import NOTIFY_PORT
 from spinn_front_end_common.utilities.database import DatabaseConnection
 
-from spynnaker.pyNN.external_devices_models import AbstractEthernetTranslator
+from spynnaker.pyNN.external_devices_models. \
+    abstract_ethernet_translator import AbstractEthernetTranslator
 
 
 class EthernetCommandConnection(DatabaseConnection):

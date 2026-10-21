@@ -32,7 +32,7 @@ from quantities import Quantity, ms
 from spinn_utilities.local_time_zone import LOCAL
 from spinn_utilities.log import FormatAdapter
 
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 
 if TYPE_CHECKING:
     from _csv import Reader as CSVReader

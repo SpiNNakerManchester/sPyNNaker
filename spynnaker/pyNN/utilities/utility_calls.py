@@ -44,19 +44,30 @@ from spinn_front_end_common.utilities.constants import (
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker.pyNN.utilities.constants import WRITE_BANDWIDTH_BYTES_PER_SECOND
-from spynnaker.pyNN.utilities.random_stats import (
-    RandomStatsBinomialImpl,
-    RandomStatsExponentialClippedImpl,
-    RandomStatsExponentialImpl,
-    RandomStatsGammaImpl,
-    RandomStatsLogNormalImpl,
-    RandomStatsNormalClippedImpl,
-    RandomStatsNormalImpl,
-    RandomStatsPoissonImpl,
-    RandomStatsRandIntImpl,
-    RandomStatsUniformImpl,
-    RandomStatsVonmisesImpl,
-)
+from spynnaker.pyNN.utilities.random_stats. \
+    random_stats_binomial_impl import RandomStatsBinomialImpl
+from spynnaker.pyNN.utilities.random_stats. \
+    random_stats_exponential_clipped_impl import (
+        RandomStatsExponentialClippedImpl,
+    )
+from spynnaker.pyNN.utilities.random_stats. \
+    random_stats_exponential_impl import RandomStatsExponentialImpl
+from spynnaker.pyNN.utilities.random_stats. \
+    random_stats_gamma_impl import RandomStatsGammaImpl
+from spynnaker.pyNN.utilities.random_stats. \
+    random_stats_log_normal_impl import RandomStatsLogNormalImpl
+from spynnaker.pyNN.utilities.random_stats. \
+    random_stats_normal_clipped_impl import RandomStatsNormalClippedImpl
+from spynnaker.pyNN.utilities.random_stats. \
+    random_stats_normal_impl import RandomStatsNormalImpl
+from spynnaker.pyNN.utilities.random_stats. \
+    random_stats_poisson_impl import RandomStatsPoissonImpl
+from spynnaker.pyNN.utilities.random_stats. \
+    random_stats_randint_impl import RandomStatsRandIntImpl
+from spynnaker.pyNN.utilities.random_stats. \
+    random_stats_uniform_impl import RandomStatsUniformImpl
+from spynnaker.pyNN.utilities.random_stats. \
+    random_stats_vonmises_impl import RandomStatsVonmisesImpl
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.spynnaker_types import IoDest

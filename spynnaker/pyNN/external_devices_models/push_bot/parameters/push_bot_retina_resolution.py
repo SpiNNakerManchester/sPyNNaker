@@ -14,7 +14,9 @@
 
 from enum import Enum
 
-from spynnaker.pyNN.protocols import RetinaKey
+from spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol import (
+    RetinaKey,
+    )
 
 
 class PushBotRetinaResolution(Enum):

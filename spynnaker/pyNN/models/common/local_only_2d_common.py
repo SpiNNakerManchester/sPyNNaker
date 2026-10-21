@@ -26,11 +26,13 @@ from pacman.model.routing_info import AppVertexRoutingInfo
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
-from spynnaker.pyNN.models.abstract_models import ColouredApplicationVertex
+from spynnaker.pyNN.models.abstract_models.coloured_application_vertex import (
+    ColouredApplicationVertex,
+)
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 if TYPE_CHECKING:
-    from spynnaker.pyNN.models.neuron import PopulationVertex
+    from spynnaker.pyNN.models.neuron.population_vertex import PopulationVertex
     from spynnaker.pyNN.models.projection import Projection
 
 #: The number of bits in a short value

@@ -31,14 +31,16 @@ from spinn_front_end_common.interface.buffer_management.buffer_models import (
 )
 from spinn_front_end_common.interface.ds import DataSpecificationBase
 
-from spynnaker.pyNN.models.abstract_models import (
-    AbstractSynapseExpandable,
-    HasSynapses,
-)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSDRAMSynapseDynamics,
-    AbstractSynapseDynamicsStructural,
-)
+from spynnaker.pyNN.models.abstract_models. \
+    abstract_synapse_expandable import AbstractSynapseExpandable
+from spynnaker.pyNN.models.abstract_models. \
+    has_synapses import HasSynapses
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    abstract_sdram_synapse_dynamics import AbstractSDRAMSynapseDynamics
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    abstract_synapse_dynamics_structural import (
+        AbstractSynapseDynamicsStructural,
+    )
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 from .population_machine_synapses_provenance import (

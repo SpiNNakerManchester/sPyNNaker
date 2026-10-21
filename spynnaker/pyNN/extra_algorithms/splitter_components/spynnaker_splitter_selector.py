@@ -27,16 +27,17 @@ from pacman.model.partitioner_splitters import (
 
 from spinn_front_end_common.interface.splitter_selectors import vertex_selector
 
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerSplitterConfigurationException
-from spynnaker.pyNN.models.abstract_models import (
-    AbstractAcceptsIncomingSynapses,
-)
-from spynnaker.pyNN.models.neuron import PopulationVertex
-from spynnaker.pyNN.models.spike_source import (
+from spynnaker.pyNN.models.abstract_models. \
+    abstract_accepts_incoming_synapses import AbstractAcceptsIncomingSynapses
+from spynnaker.pyNN.models.neuron.population_vertex import PopulationVertex
+from spynnaker.pyNN.models.spike_source.spike_source_array_vertex import (
     SpikeSourceArrayVertex,
+    )
+from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
     SpikeSourcePoissonVertex,
-)
+    )
 
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 from .splitter_poisson_delegate import SplitterPoissonDelegate
