@@ -369,17 +369,16 @@ class Projection:
     @staticmethod
     def __save_callback(
             save_file: str | BaseFile,
-            metadata: dict[str, Any], data: ConnectionHolder) -> None:
-        """
-        :param save_file:
-        :param metadata:
-        :param data:
-        """
-        # Convert structured array to normal numpy array
-        if hasattr(data, "dtype") and hasattr(data.dtype, "names"):
-            dtype = [(name, "<f8") for name in data.dtype.names]
-            data = data.astype(dtype)
-        npdata = numpy.nan_to_num(cast(NDArray, data))
+            metadata: dict[str, Any], holder: ConnectionHolder) -> None:
+        data = holder.get_data_items()
+        if isinstance(data, numpy.ndarray):
+            # Convert structured array to normal numpy array
+            dtype = data.dtype
+            if dtype.names:
+                new_types = [(name, "<f8") for name in dtype.names]
+                data = data.astype(new_types)
+        npdata = numpy.nan_to_num(data)
+
         if isinstance(save_file, str):
             data_file = open(save_file, mode='wb')  # NOQA: SIM115
         else:
