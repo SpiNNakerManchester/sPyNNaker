@@ -189,6 +189,7 @@ class ConnectionHolder:
         Obtains the data using the connections added after run.
 
         :raises ConnectionHolderNotReadyException: If the data is not ready
+        :returns: The raw data as if there was no ConnectionHolder
         """
         # If there are already merged connections cached, return those
         if self.__data_items is not None:
