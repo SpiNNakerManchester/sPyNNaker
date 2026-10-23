@@ -15,6 +15,7 @@
 from collections.abc import Callable, Iterator, Sequence
 from typing import (
     Any,
+    Literal,
     TypeAlias,
     TypeGuard,
 )
@@ -23,6 +24,10 @@ import numpy
 from numpy.lib.recfunctions import merge_arrays
 from numpy.typing import NDArray
 
+from spinn_utilities.config_holder import get_config_bool
+
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
+from spynnaker.pyNN.exceptions import ConnectionHolderNotReadyException
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     ConnectionsArray,
 )
@@ -120,6 +125,8 @@ class ConnectionHolder:
         if self.__connections is None:
             self.__connections = []
         self.__connections.append(connections)
+        # reset data items as there is more data
+        self.__data_items = None
 
     @property
     def connections(self) -> list[ConnectionsArray]:
@@ -135,33 +142,64 @@ class ConnectionHolder:
         if self.__notify is not None:
             self.__notify(self)
 
-    def _get_data_items(self) -> _Items:
+    def verify_data_ready(self) -> Literal[True]:
         """
-        Merges the connections into the result data format.
+        Checks the data items are ready to be used.
+
+        Will fail if there are no connections.
+
+        :returns: True if data is available
+        :raises ConnectionHolderNotReadyException: If the data is not ready
+        """
+        if self.__connections:
+            return True
+
+        if get_config_bool("Machine", "virtual_board"):
+            raise ConnectionHolderNotReadyException(
+                "Virtual Machines never have data"
+                f"{self.__data_items_to_return} likely never set.")
+
+        if not SpynnakerDataView.is_ran_ever():
+            raise ConnectionHolderNotReadyException(
+                f"Connections are only set after run has been called, "
+                f"even if you are trying to see the data before changes "
+                f"have been made. Try examining the "
+                f"{self.__data_items_to_return} after the call to run.")
+
+        if SpynnakerDataView.get_requires_mapping():
+            raise ConnectionHolderNotReadyException(
+                f"Connections are only set after run using it has happened, "
+                f"even if you are trying to see the data before changes "
+                f"have been made. Try examining the "
+                f"{self.__data_items_to_return} after the call to run.")
+
+        if self.__connections is None:
+            raise ConnectionHolderNotReadyException(
+                "add_connections method never called. Despite run")
+
+        if len(self.__connections) == 0:
+            raise ConnectionHolderNotReadyException(
+                "add_connections method called with empty list only.")
+
+        raise ConnectionHolderNotReadyException(
+            f"Excepted reason {self.__connections=} is False")
+
+    def get_data_items(self) -> _Items:
+        """
+        Obtains the data using the connections added after run.
+
+        :raises ConnectionHolderNotReadyException: If the data is not ready
+        :returns: The raw data as if there was no ConnectionHolder
         """
         # If there are already merged connections cached, return those
         if self.__data_items is not None:
             return self.__data_items
 
-        if not self.__connections:
-            # If there are no connections added, raise an exception
-            if self.__connections is None:
-                raise NotImplementedError(
-                    f"Connections are only set after run has been called, "
-                    f"even if you are trying to see the data before changes "
-                    f"have been made. Try examining the "
-                    f"{self.__data_items_to_return} after the call to run.")
-            # If the list is empty assume on a virtual machine
-            # with generation on machine
-            if len(self.__connections) == 0:
-                raise NotImplementedError(
-                    "Connections list is empty. "
-                    "This may be because you are using a virtual machine. "
-                    "This projection creates connections on machine.")
+        self.verify_data_ready()
 
         # Join all the connections that have been added (probably over multiple
         # sub-vertices of a population)
-        connections: ConnectionsArray = numpy.concatenate(self.__connections)
+        connections: ConnectionsArray = numpy.concatenate(self.connections)
 
         # If there are additional fixed values, merge them in
         if self.__fixed_values:
@@ -242,30 +280,30 @@ class ConnectionHolder:
     def __getitem__(self, s: int) -> (
             numpy.floating | NDArray[numpy.floating] |
             list[numpy.floating]):
-        data = self._get_data_items()
+        data = self.get_data_items()
         return data[s]
 
     def __len__(self) -> int:
-        data = self._get_data_items()
+        data = self.get_data_items()
         return len(data)
 
     def __iter__(self) -> Iterator:
-        data = self._get_data_items()
+        data = self.get_data_items()
         return iter(data)
 
     def __str__(self) -> str:
-        data = self._get_data_items()
+        data = self.get_data_items()
         return data.__str__()
 
     def __repr__(self) -> str:
-        data = self._get_data_items()
+        data = self.get_data_items()
         return data.__repr__()
 
-    def __getattr__(self, name: str) -> Any:
+    def __getattr__(self, name: str) -> object:
         """
         Gets the attributes from the NDArray if applicable
 
         :raises AttributeError: If the data does not have this attribute.
         """
-        data = self._get_data_items()
+        data = self.get_data_items()
         return getattr(data, name)

@@ -105,10 +105,12 @@ def check_params(param: float, result: ConnectionHolder) -> None:
     if not isinstance(param, p.RandomDistribution):
         assert all(param == value for value in result)
     else:
+        # For mypy: amin and amax work directly on ConnectionHolder
+        data = result.get_data_items()
+        minimum = numpy.amin(data)
+        maximum = numpy.amax(data)
         # Check the values are "random" (yes I know they might be the same,
         # but the chances are quite small!)
-        minimum = numpy.amin(result)
-        maximum = numpy.amax(result)
         assert minimum != maximum
 
         if "low" in param.parameters:

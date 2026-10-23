@@ -108,8 +108,16 @@ class LargePopWeightDelayRetrival(BaseTestCase):
         self.assertEqual(sources * targets, len(pre_weights_list))
         self.assertEqual(sources * targets, len(post_delays_list))
         self.assertEqual(sources * targets, len(post_weights_list))
-        self.assertTrue(numpy.allclose(pre_delays_array, post_delays_array))
-        self.assertTrue(numpy.allclose(pre_weights_array, post_weights_array))
+
+        # For mypy: allclose works directly on ConnectionHolders
+        actual_pre_delays = pre_delays_array.get_data_items()
+        actual_post_delays = post_delays_array.get_data_items()
+        actual_pre_weights = pre_weights_array.get_data_items()
+        actual_post_weights = post_weights_array.get_data_items()
+        self.assertTrue(numpy.allclose(actual_pre_delays, actual_post_delays))
+        self.assertTrue(numpy.allclose(
+            actual_pre_weights, actual_post_weights))
+
         for i in range(sources*targets):
             pre_weights = pre_weights_list[i]
             assert isinstance(pre_weights, list)

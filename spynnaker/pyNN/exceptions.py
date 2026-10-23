@@ -95,3 +95,9 @@ class SynapseRowTooBigException(SpynnakerException):
         The maximum size allowed.
         """
         return self._max_size
+
+
+class ConnectionHolderNotReadyException(SpynnakerException):
+    """
+    Raise when a ConnectionHolders data is requested before it is available
+    """
