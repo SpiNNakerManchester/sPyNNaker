@@ -16,7 +16,6 @@ from __future__ import annotations
 import logging
 from collections.abc import Iterable, Sequence
 from typing import (
-    TYPE_CHECKING,
     cast,
     overload,
 )
@@ -37,8 +36,6 @@ from spynnaker.pyNN.spynnaker_types import ViewIndices
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.utility_calls import get_neo_io
 
-if TYPE_CHECKING:
-    from .neo_buffer_database import Annotations
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _SELECTIVE_RECORDED_MSG = (
@@ -79,7 +76,7 @@ class DataPopulation:
     def write_data(self, io: str | neo.baseio.BaseIO,
                    variables: Names = 'all', gather: bool = True,
                    clear: bool = False,
-                   annotations: Annotations = None) -> None:
+                   annotations: dict[str, object] | None = None) -> None:
         # pylint: disable=missing-function-docstring,protected-access
         Population._check_params(gather, annotations)
         if clear:

@@ -18,7 +18,7 @@ import logging
 from collections import defaultdict
 from collections.abc import Iterable
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import Mapping, TYPE_CHECKING
 
 import numpy
 from neo import AnalogSignal, Block, Event, Segment, SpikeTrain
@@ -35,7 +35,6 @@ if TYPE_CHECKING:
     from _csv import Reader as CSVReader
     from _csv import Writer as CSVWriter
 
-    from spynnaker.pyNN.utilities.neo_buffer_database import Annotations
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -519,7 +518,7 @@ class NeoCsv:
     def _insert_empty_block(
             self, pop_label: str, description: str, size: int, first_id: int,
             dt: float, simulator: str,
-            annotations: Annotations = None) -> Block:
+            annotations: Mapping[str, object] | None) -> Block:
         """
         Creates and empty Neo block object with just metadata.
 
@@ -550,7 +549,7 @@ class NeoCsv:
     def _csv_block_metadata(
             self, csv_writer: CSVWriter, pop_label: str, t_stop: float,
             pop_size: int, first_id: int, description: str,
-            annotations: Annotations) -> None:
+            annotations: dict[str, object] | None) -> None:
         """
         :param csv_writer: Open CSV writer to write to
         :param pop_label:

@@ -21,10 +21,7 @@ import re
 import struct
 from collections.abc import Collection, Iterable, Sequence
 from datetime import datetime
-from typing import (
-    TYPE_CHECKING,
-    Any,
-)
+from typing import TYPE_CHECKING
 
 import neo  # type: ignore[import]
 import numpy
@@ -69,8 +66,6 @@ if TYPE_CHECKING:
     from .data_population import DataPopulation
     #: :meta private:
     Names = ConcreteNames | None
-    #: :meta private:
-    Annotations = dict[str, Any] | None
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -1207,7 +1202,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
             self._csv_spike_data(csv_writer, spikes, indexes)
 
     def get_empty_block(self, pop_label: str,
-                        annotations: Annotations) -> neo.Block | None:
+                        annotations: dict[str, object] | None) -> neo.Block | None:
         """
         :param pop_label: The label for the population of interest
 
@@ -1235,7 +1230,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     def get_full_block(
             self, pop_label: str, variables: Names, view_indexes: ViewIndices,
-            annotations: Annotations) -> neo.Block:
+            annotations: dict[str, object] | None) -> neo.Block:
         """
         Creates a block with metadata and data for this segment.
         Any previous segments will be empty.
@@ -1298,7 +1293,7 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
 
     def csv_block_metadata(
             self, csv_file: str, pop_label: str,
-            annotations: Annotations = None) -> bool:
+            annotations: dict[str, object] | None) -> bool:
         """
         Writes the data including metadata to a CSV file.
         Overwrites any previous data in the file.
