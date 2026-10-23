@@ -26,7 +26,7 @@ from numpy.typing import NDArray
 
 from spinn_utilities.config_holder import get_config_bool
 
-from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.exceptions import ConnectionHolderNotReadyException
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     ConnectionsArray,
