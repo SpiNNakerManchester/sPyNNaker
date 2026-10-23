@@ -14,7 +14,7 @@
 
 from collections.abc import Mapping, Sequence
 from enum import Enum
-from typing import Any, TypeAlias
+from typing import TypeAlias
 
 import numpy
 from numpy import integer, uint8, uint32
@@ -270,10 +270,10 @@ class Struct:
 
         # Get the value to write, of which there can only be one
         # (or else there will be an error here ;)
-        value: Any
+        value: object
         if name in values:
             value = values[name]
-            if not is_singleton(value):
+            if isinstance(object, AbstractList):
                 value = value.get_single_value_all()
         else:
             value = self.__default_values[name]

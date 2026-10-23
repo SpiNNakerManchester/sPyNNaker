@@ -18,8 +18,8 @@ import logging
 from collections.abc import Callable, Sequence
 from typing import (
     TYPE_CHECKING,
-    Any,
     Literal,
+    Mapping,
     TypeAlias,
     cast,
 )
@@ -369,7 +369,7 @@ class Projection:
     @staticmethod
     def __save_callback(
             save_file: str | BaseFile,
-            metadata: dict[str, Any], holder: ConnectionHolder) -> None:
+            metadata: Mapping[str, object], holder: ConnectionHolder) -> None:
         data = holder.get_data_items()
         if isinstance(data, numpy.ndarray):
             # Convert structured array to normal numpy array
@@ -503,7 +503,7 @@ class Projection:
 
     # -----------------------------------------------------------------
 
-    def set(self, **attributes: Any) -> Never:  # @UnusedVariable
+    def set(self, **attributes: object) -> Never:  # @UnusedVariable
         """
         .. warning::
             Not implemented.
