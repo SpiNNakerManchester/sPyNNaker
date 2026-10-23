@@ -17,7 +17,6 @@ import logging
 from collections.abc import Iterable, Sequence
 from typing import (
     TYPE_CHECKING,
-    Any,
     cast,
     overload,
 )
@@ -94,7 +93,7 @@ class DataPopulation:
     @overrides(Population.describe)
     def describe(self, template: str | None = None,
                  engine: str | TemplateEngine | None = None
-                 ) -> str | dict[str, Any]:
+                 ) -> str | dict[str, object]:
         # pylint: disable=missing-function-docstring
         if template is not None:
             logger.warning("Ignoring template as not supported in this mode")
@@ -108,7 +107,7 @@ class DataPopulation:
     def get_data(
             self, variables: Names = 'all',
             gather: bool = True, clear: bool = False, *,
-            annotations: dict[str, Any] | None = None) -> neo.Block:
+            annotations: dict[str, object] | None = None) -> neo.Block:
         # pylint: disable=missing-function-docstring,protected-access
         Population._check_params(gather, annotations)
         if clear:

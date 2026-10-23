@@ -18,10 +18,7 @@ import logging
 from collections import defaultdict
 from collections.abc import Iterable
 from datetime import datetime
-from typing import (
-    TYPE_CHECKING,
-    Any,
-)
+from typing import TYPE_CHECKING
 
 import numpy
 from neo import AnalogSignal, Block, Event, Segment, SpikeTrain
@@ -536,7 +533,7 @@ class NeoCsv:
         block = Block()
         block.name = pop_label
         block.description = description
-        metadata: dict[str, Any] = {}
+        metadata: dict[str, object] = {}
         metadata[self._SIZE] = size
         metadata["first_index"] = 0
         metadata['last_index'] = size,
