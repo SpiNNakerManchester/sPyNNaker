@@ -15,11 +15,10 @@ from __future__ import annotations
 
 import functools
 import logging
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from typing import (
     TYPE_CHECKING,
     Literal,
-    Mapping,
     TypeAlias,
     cast,
 )
@@ -59,7 +58,7 @@ from spynnaker.pyNN.models.populations.population import Population
 from spynnaker.pyNN.models.populations.population_view import PopulationView
 from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
     SpikeSourcePoissonVertex,
-    )
+)
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections.connectors import (

@@ -36,7 +36,6 @@ from spynnaker.pyNN.spynnaker_types import ViewIndices
 from spynnaker.pyNN.utilities.neo_buffer_database import NeoBufferDatabase
 from spynnaker.pyNN.utilities.utility_calls import get_neo_io
 
-
 logger = FormatAdapter(logging.getLogger(__name__))
 _SELECTIVE_RECORDED_MSG = (
     "Getting data on a whole population when selective recording was "

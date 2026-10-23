@@ -16,9 +16,9 @@ from __future__ import annotations
 import csv
 import logging
 from collections import defaultdict
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from datetime import datetime
-from typing import Mapping, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 import numpy
 from neo import AnalogSignal, Block, Event, Segment, SpikeTrain

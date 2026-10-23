@@ -1201,8 +1201,9 @@ class NeoBufferDatabase(BufferDatabase, NeoCsv):
                 rec_id, view_indexes, buffer_type, n_colour_bits, variable)
             self._csv_spike_data(csv_writer, spikes, indexes)
 
-    def get_empty_block(self, pop_label: str,
-                        annotations: dict[str, object] | None) -> neo.Block | None:
+    def get_empty_block(
+            self, pop_label: str,
+            annotations: dict[str, object] | None) -> neo.Block | None:
         """
         :param pop_label: The label for the population of interest
 

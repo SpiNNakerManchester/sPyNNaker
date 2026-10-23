@@ -21,7 +21,6 @@ PushBot (https://spinnakermanchester.github.io/docs/push_bot/).
     accuracy to gain performance.
 """
 import os
-from typing import Any
 
 from spinn_utilities.socket_address import SocketAddress
 
@@ -267,7 +266,7 @@ def EthernetControlPopulation(
         local_host: str | None = None, local_port: int | None = None,
         database_notify_port_num: int | None = None,
         database_ack_port_num: int | None = None,
-        **additional_kwargs: dict[str, Any]) -> Population:
+        **additional_kwargs: dict[str, object]) -> Population:
     # pylint: disable=invalid-name
     """
     Create a PyNN population that can be included in a network to
@@ -338,7 +337,7 @@ def EthernetSensorPopulation(
         device: AbstractEthernetSensor, local_host: str | None = None,
         database_notify_port_num: int | None = None,
         database_ack_port_num: int | None = None,
-        **additional_kwargs: dict[str, Any]) -> Population:
+        **additional_kwargs: dict[str, object]) -> Population:
     # pylint: disable=invalid-name
     """
     Create a pyNN population which can be included in a network to

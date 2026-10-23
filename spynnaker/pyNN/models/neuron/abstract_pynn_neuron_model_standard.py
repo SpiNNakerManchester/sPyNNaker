@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, cast
 
 from spinn_utilities.overrides import overrides
 
@@ -43,7 +43,7 @@ if TYPE_CHECKING:
 
     from .population_vertex import PopulationVertex
 
-_population_parameters: dict[str, Any] = dict(APNM_default_params)
+_population_parameters: dict[str, object] = dict(APNM_default_params)
 _population_parameters["n_steps_per_timestep"] = 1
 
 
