@@ -16,6 +16,7 @@ from collections.abc import Callable, Iterator, Sequence
 from typing import (
     Any,
     Literal,
+    Sequence,
     TypeAlias,
     TypeGuard,
 )
@@ -79,7 +80,7 @@ class ConnectionHolder:
             self, data_items_to_return: list[str] | None, as_list: bool,
             n_pre_atoms: int, n_post_atoms: int,
             connections: list[ConnectionsArray] | None = None,
-            fixed_values: list[tuple[str, int]] | None = None,
+            fixed_values: Sequence[tuple[str, float]] | None = None,
             notify: Callable[['ConnectionHolder'], None] | None = None):
         """
         :param data_items_to_return: A list of data fields to be returned

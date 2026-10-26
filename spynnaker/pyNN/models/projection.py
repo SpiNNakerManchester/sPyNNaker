@@ -354,7 +354,7 @@ class Projection:
                 attribute_names.remove("target")
 
         # Split out attributes in to standard versus synapse dynamics data
-        fixed_values: list[tuple[str, int]] = []
+        fixed_values: list[tuple[str, float]] = []
         for attribute in attribute_names:
             data_items.append(attribute)
             synapse_dynamics = self._synapse_information.synapse_dynamics
@@ -459,7 +459,7 @@ class Projection:
 
     def _get_synaptic_data(
             self, as_list: bool, data_to_get: list[str],
-            fixed_values: list[tuple[str, int]],
+            fixed_values: list[tuple[str, float]],
             notify: Callable[[ConnectionHolder], None] | None
             ) -> ConnectionHolder:
         post_vertex = self.__projection_edge.post_vertex

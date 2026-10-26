@@ -556,7 +556,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
             self, synapse_type: AbstractSynapseDynamics) -> None:
         if self.__extra_params:
             for i, name in enumerate(self.__extra_params.names):
-                synapse_type.set_value(name, self.__extra_params.data[:, i])
+                synapse_type.set_value(name, self.__extra_params.data[0, i])
 
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(
