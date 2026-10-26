@@ -95,7 +95,7 @@ class Population(PopulationBase):
             initial_values: dict[str, float] | None = None,
             label: str | None = None,
             additional_parameters: _ParamDict | None = None,
-            **additional_kwargs: _ParamDict):
+            **additional_kwargs: object):
         """
         :param size: The number of neurons in the population
         :param cellclass: The implementation of the individual neurons.
