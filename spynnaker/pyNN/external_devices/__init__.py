@@ -298,7 +298,7 @@ def EthernetControlPopulation(
     """
     # pylint: disable=global-statement
     population = Population(n_neurons, model, label=label,
-                            **additional_kwargs)
+                            **additional_kwargs)  # type: ignore
     vertex, aec, vertex_label = __vtx(population)
     translator = aec.get_message_translator()
     live_packet_gather_label = "EthernetControlReceiver"
@@ -371,7 +371,7 @@ def EthernetSensorPopulation(
         device.get_n_neurons(), SpikeInjector(notify=False),
         label=device.get_injector_label(),
         additional_parameters=injector_params,
-        **additional_kwargs)
+        **additional_kwargs)  # type: ignore
     if isinstance(device, AbstractSendMeMulticastCommandsVertex):
         cmd_conn = EthernetCommandConnection(
             device.get_translator(), [device], local_host,
