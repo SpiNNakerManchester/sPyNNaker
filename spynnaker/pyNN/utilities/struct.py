@@ -273,7 +273,7 @@ class Struct:
         value: object
         if name in values:
             value = values[name]
-            if isinstance(object, AbstractList):
+            if isinstance(value, AbstractList):
                 value = value.get_single_value_all()
         else:
             value = self.__default_values[name]
