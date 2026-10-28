@@ -1929,14 +1929,14 @@ class _Stats:
         w_var_pos = signed_dynamics.get_variance_positive_weight(proj)
         w_max_pos = signed_dynamics.get_maximum_positive_weight(proj)
         self.__add_details(
-            proj, s_type_pos, n_conns, w_mean_pos, w_var_pos, w_max_pos, d_var)
+            s_type_pos, n_conns, w_mean_pos, w_var_pos, w_max_pos, d_var)
 
         s_type_neg = signed_dynamics.get_negative_synapse_index(proj)
         w_mean_neg = -signed_dynamics.get_mean_negative_weight(proj)
         w_var_neg = -signed_dynamics.get_variance_negative_weight(proj)
         w_max_neg = -signed_dynamics.get_minimum_negative_weight(proj)
         self.__add_details(
-            proj, s_type_neg, n_conns, w_mean_neg, w_var_neg, w_max_neg, d_var)
+            s_type_neg, n_conns, w_mean_neg, w_var_neg, w_max_neg, d_var)
 
     def __add_unsigned_projection(self, proj: Projection) -> None:
         # pylint: disable=protected-access
@@ -1951,10 +1951,10 @@ class _Stats:
             connector, s_info.weights, s_info)
         w_max = s_dynamics.get_weight_maximum(connector, s_info)
         d_var = s_dynamics.get_delay_variance(connector, s_info.delays, s_info)
-        self.__add_details(proj, s_type, n_conns, w_mean, w_var, w_max, d_var)
+        self.__add_details(s_type, n_conns, w_mean, w_var, w_max, d_var)
 
     def __add_details(
-            self, proj: Projection, s_type: int, n_conns: int, w_mean: float,
+            self, s_type: int, n_conns: int, w_mean: float,
             w_var: float, w_max: float, d_var: float) -> None:
         self.running_totals[s_type].add_items(
             w_mean * self.w_scale, w_var * self.w_scale_sq, n_conns)
@@ -1962,11 +1962,11 @@ class _Stats:
             self.biggest_weight[s_type], w_max * self.w_scale)
         self.delay_running_totals[s_type].add_items(0.0, d_var, n_conns)
 
-        spikes_per_tick, spikes_per_second = self.__pre_spike_stats(proj)
+        spikes_per_tick, spikes_per_second = self.__pre_spike_stats()
         self.rate_stats[s_type].add_items(spikes_per_second, 0, n_conns)
         self.total_weights[s_type] += spikes_per_tick * (w_max * n_conns)
 
-    def __pre_spike_stats(self, proj: Projection) -> tuple[float, float]:
+    def __pre_spike_stats(self) -> tuple[float, float]:
         spikes_per_tick = max(
             1.0, self.default_spikes_per_second / self.steps_per_second)
         spikes_per_second = self.default_spikes_per_second
