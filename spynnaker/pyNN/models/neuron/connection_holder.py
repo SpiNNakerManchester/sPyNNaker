@@ -16,7 +16,6 @@ from collections.abc import Callable, Iterator, Sequence
 from typing import (
     Any,
     Literal,
-    Sequence,
     TypeAlias,
     TypeGuard,
 )
