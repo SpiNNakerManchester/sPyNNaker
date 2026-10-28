@@ -72,9 +72,6 @@ from spynnaker.pyNN.exceptions import (
 )
 from spynnaker.pyNN.models.abstract_models. \
     abstract_accepts_incoming_synapses import AbstractAcceptsIncomingSynapses
-from spynnaker.pyNN.models.abstract_models.abstract_max_spikes import (
-    AbstractMaxSpikes,
-)
 from spynnaker.pyNN.models.abstract_models.has_synapses import HasSynapses
 from spynnaker.pyNN.models.abstract_models.supports_structure import (
     SupportsStructure,
@@ -719,10 +716,6 @@ class PopulationVertex(
         poisson_synapses_per_second: int = 0
         for pre_vertex, projs in self.__incoming_projections.items():
             spikes_per_second = self.__spikes_per_second
-            if isinstance(pre_vertex, AbstractMaxSpikes):
-                rate = pre_vertex.max_spikes_per_second()
-                if rate > 0:
-                    spikes_per_second = rate
 
             pre_synapses_per_second: int = 0
             for proj in projs:
@@ -1979,11 +1972,6 @@ class _Stats:
         spikes_per_second = self.default_spikes_per_second
         # pylint: disable=protected-access
         pre_vertex = proj._projection_edge.pre_vertex
-        if isinstance(pre_vertex, AbstractMaxSpikes):
-            rate = pre_vertex.max_spikes_per_second()
-            if rate > 0:
-                spikes_per_second = rate
-            spikes_per_tick = pre_vertex.max_spikes_per_ts()
         return spikes_per_tick, spikes_per_second
 
     @staticmethod

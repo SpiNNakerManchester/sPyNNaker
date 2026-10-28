@@ -81,8 +81,6 @@ from spinn_front_end_common.utilities.helpful_functions import (
 from spynnaker.pyNN.data.spynnaker_data_view import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models. \
-    abstract_max_spikes import AbstractMaxSpikes
-from spynnaker.pyNN.models.abstract_models. \
     receives_synaptic_inputs_over_sdram import ReceivesSynapticInputsOverSDRAM
 from spynnaker.pyNN.models.abstract_models. \
     sends_synaptic_inputs_over_sdram import SendsSynapticInputsOverSDRAM
@@ -352,16 +350,12 @@ class SpikeSourcePoissonMachineVertex(
     def get_binary_start_type(self) -> ExecutableType:
         return ExecutableType.USES_SIMULATION_INTERFACE
 
-    @overrides(AbstractMaxSpikes.max_spikes_per_second)
-    def max_spikes_per_second(self) -> float:
-        # pylint: disable=missing-function-docstring
-        # TODO https://github.com/SpiNNakerManchester/sPyNNaker/issues/1435
-        return self._pop_vertex.max_rate
-
-    @overrides(AbstractMaxSpikes.max_spikes_per_ts)
     def max_spikes_per_ts(self) -> float:
-        # pylint: disable=missing-function-docstring
-        # TODO https://github.com/SpiNNakerManchester/sPyNNaker/issues/1435
+        """
+        Compute the maximum spike rate.
+
+        :return: The maximum number of spikes per simulation timestep.
+        """
         return self._pop_vertex.max_spikes_per_ts()
 
     @overrides(AbstractRewritesDataSpecification.reload_required)
