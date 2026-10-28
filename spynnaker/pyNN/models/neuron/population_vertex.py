@@ -1970,8 +1970,6 @@ class _Stats:
         spikes_per_tick = max(
             1.0, self.default_spikes_per_second / self.steps_per_second)
         spikes_per_second = self.default_spikes_per_second
-        # pylint: disable=protected-access
-        pre_vertex = proj._projection_edge.pre_vertex
         return spikes_per_tick, spikes_per_second
 
     @staticmethod
