@@ -89,8 +89,8 @@ class Projection:
     )
 
     def __init__(
-            self, pre_synaptic_population: _Pop,
-            post_synaptic_population: _Pop, connector: AbstractConnector,
+            self, presynaptic_population: _Pop,
+            postsynaptic_population: _Pop, connector: AbstractConnector,
             synapse_type: AbstractSynapseDynamics | None = None,
             source: None = None, receptor_type: str = "excitatory",
             space: PyNNSpace | None = None,
@@ -98,8 +98,8 @@ class Projection:
             download_synapses: bool = False,
             partition_id: str | None = None):
         """
-        :param pre_synaptic_population:
-        :param post_synaptic_population:
+        :param presynaptic_population:
+        :param postsynaptic_population:
         :param connector:
         :param synapse_type:
         :param source: Unsupported; must be `None`
@@ -113,15 +113,15 @@ class Projection:
                 f"sPyNNaker {__version__} does not yet support "
                 "multi-compartmental cells.")
 
-        pre_is_view = self.__check_population(pre_synaptic_population)
-        post_is_view = self.__check_population(post_synaptic_population)
+        pre_is_view = self.__check_population(presynaptic_population)
+        post_is_view = self.__check_population(postsynaptic_population)
 
         # set default label
         if label is None:
             # set the projection's label to a default (maybe non-unique!)
             self.__label = (
-                f"from pre {pre_synaptic_population.label} "
-                f"to post {post_synaptic_population.label} "
+                f"from pre {presynaptic_population.label} "
+                f"to post {postsynaptic_population.label} "
                 f"with connector {connector}")
             # give an auto generated label for the underlying edge
             label = f"projection edge " \
@@ -142,8 +142,8 @@ class Projection:
             space = PyNNSpace()
         connector.set_space(space)
 
-        pre_vertex = pre_synaptic_population._vertex
-        post_vertex = cast(PopulationVertex, post_synaptic_population._vertex)
+        pre_vertex = presynaptic_population._vertex
+        post_vertex = cast(PopulationVertex, postsynaptic_population._vertex)
 
         if not isinstance(post_vertex, AbstractAcceptsIncomingSynapses):
             raise ConfigurationException(
@@ -160,7 +160,7 @@ class Projection:
         if synapse_id is None:
             raise ConfigurationException(
                 f"Synapse target {receptor_type} not found "
-                f"in {post_synaptic_population.label}")
+                f"in {postsynaptic_population.label}")
 
         # as a from-list connector can have plastic parameters, grab those (
         # if any) and add them to the synapse dynamics object
@@ -173,7 +173,7 @@ class Projection:
 
         # Set and store synapse information for future processing
         self.__synapse_information = SynapseInformation(
-            connector, pre_synaptic_population, post_synaptic_population,
+            connector, presynaptic_population, postsynaptic_population,
             pre_is_view, post_is_view, synapse_dynamics,
             synapse_id, receptor_type, synapse_id_from_dynamics,
             synapse_dynamics.weight, synapse_dynamics.delay,
