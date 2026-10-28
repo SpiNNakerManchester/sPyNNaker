@@ -369,8 +369,8 @@ class Projection:
             format == "list", data_items, fixed_values, notify=notify)
 
     @staticmethod
-    def __save_callback(
-            save_file: str, metadata: dict[str, Any], holder: ConnectionHolder) -> None:
+    def __save_callback(save_file: str, metadata: dict[str, Any],
+                        holder: ConnectionHolder) -> None:
         data = holder.get_data_items()
         if isinstance(data, numpy.ndarray):
             # Convert structured array to normal numpy array
