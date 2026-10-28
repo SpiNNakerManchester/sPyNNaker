@@ -87,8 +87,6 @@ from spynnaker.pyNN.models.current_sources.step_current_source import (
 # connections
 # noinspection PyUnresolvedReferences
 from spynnaker.pyNN.models.neural_projections.connectors. \
-    abstract_connector import AbstractConnector
-from spynnaker.pyNN.models.neural_projections.connectors. \
     all_to_all_connector import AllToAllConnector
 from spynnaker.pyNN.models.neural_projections.connectors. \
     array_connector import ArrayConnector
@@ -179,8 +177,6 @@ from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
     .partner_selection.last_neuron_selection import LastNeuronSelection
 from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis \
     .partner_selection.random_selection import RandomSelection
-from spynnaker.pyNN.models.neuron.synapse_dynamics. \
-    abstract_synapse_dynamics import AbstractSynapseDynamics
 
 # synapse structures
 from spynnaker.pyNN.models.neuron.synapse_dynamics. \
@@ -226,7 +222,6 @@ from spynnaker.pyNN.setup_pynn import setup_pynn
 
 # big stuff
 from spynnaker.pyNN.spinnaker import SpiNNaker
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 #: The timestep to use of "auto" is specified as a timestep
 SPYNNAKER_AUTO_TIMESTEP = 1.0
