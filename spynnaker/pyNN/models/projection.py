@@ -27,7 +27,6 @@ from typing import (
 import numpy
 from numpy import void
 from numpy.typing import NDArray
-from pyNN.recording.files import BaseFile
 from pyNN.space import Space as PyNNSpace
 from typing_extensions import Never
 
@@ -278,8 +277,7 @@ class Projection:
 
     def save(
             self, attribute_names: str | Sequence[str],
-            file: str | BaseFile,
-            format: str = 'list',  # @ReservedAssignment
+            file: str,  format: str = 'list',  # @ReservedAssignment
             gather: Literal[True] = True, with_address: bool = True) -> None:
         """
         Print synaptic attributes (weights, delays, etc.) to file. In the
@@ -292,15 +290,19 @@ class Projection:
             SpiNNaker always gathers.
 
         :param attribute_names:
-        :param file: filename or open handle (which will be closed)
+        :param file: filename
         :param format:
         :param gather: Ignored. Purely for PyNN compatibility
         :param with_address:
+        :raises NotImplementedError: If file is not a string
         """
         if not gather:
             warn_once(
                 logger, "sPyNNaker only supports gather=True. We will run "
                 "as if gather was set to True.")
+        if not isinstance(file, str):
+            raise NotImplementedError(
+                "sPyNNaker only supports save with a filename/path")
         if isinstance(attribute_names, str):
             attribute_names = [attribute_names]
         else:
@@ -368,8 +370,7 @@ class Projection:
 
     @staticmethod
     def __save_callback(
-            save_file: str | BaseFile,
-            metadata: dict[str, Any], holder: ConnectionHolder) -> None:
+            save_file: str, metadata: dict[str, Any], holder: ConnectionHolder) -> None:
         data = holder.get_data_items()
         if isinstance(data, numpy.ndarray):
             # Convert structured array to normal numpy array
@@ -379,11 +380,7 @@ class Projection:
                 data = data.astype(new_types)
         npdata = numpy.nan_to_num(data)
 
-        if isinstance(save_file, str):
-            data_file = open(save_file, mode='wb')  # NOQA: SIM115
-        else:
-            # https://github.com/SpiNNakerManchester/sPyNNaker/issues/1734
-            data_file = save_file
+        data_file = open(save_file, mode='wb')  # NOQA: SIM115
         try:
             header_lines = [
                 f"# {key} = {value}" for key, value in metadata.items()]
