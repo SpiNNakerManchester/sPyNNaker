@@ -496,11 +496,6 @@ class Projection:
             connection_holder.finish()
         return connection_holder
 
-    def _clear_cache(self) -> None:
-        post_vertex = self.__projection_edge.post_vertex
-        if isinstance(post_vertex, AbstractAcceptsIncomingSynapses):
-            post_vertex.clear_connection_cache()
-
     # -----------------------------------------------------------------
 
     def set(self, **attributes: Any) -> Never:  # @UnusedVariable

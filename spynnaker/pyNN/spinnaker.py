@@ -65,6 +65,8 @@ from spynnaker.pyNN.extra_algorithms. \
     )
 from spynnaker.pyNN.extra_algorithms. \
     synapse_expander import synapse_expander
+from spynnaker.pyNN.models.abstract_models. \
+    abstract_accepts_incoming_synapses import AbstractAcceptsIncomingSynapses
 from spynnaker.pyNN.models.neural_projections. \
     projection_application_edge import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model import (
@@ -175,17 +177,17 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             called for the simulation to continue.
         """
         # sPyNNaker specific algorithms to do before starting a run
-        self.__flush_post_vertex_caches()
+        self.__flush_vertex_caches()
 
         super().run(run_time, sync_time)
 
         # PyNNaker specific algorithms to do after finishing a run
-        self.__flush_post_vertex_caches()
+        self.__flush_vertex_caches()
 
-    def __flush_post_vertex_caches(self) -> None:
-        # pylint: disable=protected-access
-        for projection in self.__writer.iterate_projections():
-            projection._clear_cache()
+    def __flush_vertex_caches(self) -> None:
+        for vertex in self.__writer.get_vertices_by_type(
+                AbstractAcceptsIncomingSynapses):
+            vertex.clear_connection_cache()
 
     def run(self, run_time: float | None, sync_time: float = 0.0) -> None:
         """
