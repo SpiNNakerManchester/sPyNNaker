@@ -16,13 +16,12 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Sized
+from collections.abc import Sized
 from typing import TYPE_CHECKING, cast
 
 import numpy
 from numpy import float64, floating, integer, uint16, uint32
 from numpy.typing import ArrayLike, NDArray
-from pyNN.random import RandomDistribution
 
 from spinn_utilities.overrides import overrides
 
@@ -152,28 +151,14 @@ class PoolDenseConnector(AbstractConnector):
     def __decode_weights(
             self, pre_shape: tuple[int, ...], post_shape: tuple[int, ...],
             post_vertex_slice: Slice) -> NDArray[float64]:
-        if isinstance(self.__weights, (int, float)):
-            n_weights = self.__get_n_weights(
-                pre_shape, post_vertex_slice.n_atoms)
-            return numpy.full(n_weights, self.__weights, dtype=float64)
-        elif isinstance(self.__weights, Iterable):
-            pre_in_post_shape = tuple(self.__get_pre_in_post_shape(pre_shape))
-            all_weights = numpy.array(self.__weights, dtype=float64).reshape(
-                pre_in_post_shape + post_shape)
-            pip_slices = tuple(
-                slice(0, pip_end + 1) for pip_end in pre_in_post_shape)
-            # TODO check this is correct
-            post_slices = post_vertex_slice.dimension
-            return all_weights[pip_slices + post_slices].flatten()
-        elif isinstance(self.__weights, RandomDistribution):
-            n_weights = self.__get_n_weights(
-                pre_shape, post_vertex_slice.n_atoms)
-            # pylint: disable=no-member
-            # see https://github.com/SpiNNakerManchester/sPyNNaker/issues/1436
-            return numpy.array(self.__weights.next(n_weights), dtype=float64)
-        else:
-            raise SynapticConfigurationException(
-                f"Unknown weights ({self.__weights})")
+        pre_in_post_shape = tuple(self.__get_pre_in_post_shape(pre_shape))
+        all_weights = numpy.array(self.__weights, dtype=float64).reshape(
+            pre_in_post_shape + post_shape)
+        pip_slices = tuple(
+            slice(0, pip_end + 1) for pip_end in pre_in_post_shape)
+        # TODO check this is correct
+        post_slices = post_vertex_slice.dimension
+        return all_weights[pip_slices + post_slices].flatten()
 
     @staticmethod
     def __to_nd_shape_or_none(
@@ -242,14 +227,13 @@ class PoolDenseConnector(AbstractConnector):
                 " of a Projection is 2D.  Please ensure that the"
                 " Population uses a Grid2D structure.")
 
-        if isinstance(self.__weights, Iterable):
-            expected_n_weights = self.__get_n_weights(
-                pre.atoms_shape, post.n_atoms)
-            if expected_n_weights != numpy.array(self.__weights).size:
-                raise ConfigurationException(
-                    f"With a source population with shape {pre.atoms_shape},"
-                    f" and a target population with shape {post.atoms_shape},"
-                    f" this connector requires {expected_n_weights} weights")
+        expected_n_weights = self.__get_n_weights(
+            pre.atoms_shape, post.n_atoms)
+        if expected_n_weights != numpy.array(self.__weights).size:
+            raise ConfigurationException(
+                f"With a source population with shape {pre.atoms_shape},"
+                f" and a target population with shape {post.atoms_shape},"
+                f" this connector requires {expected_n_weights} weights")
         if post.get_synapse_id_by_target(
                 self.__positive_receptor_type) is None:
             raise ConfigurationException(
@@ -296,11 +280,7 @@ class PoolDenseConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info: SynapseInformation) -> float:
-        if isinstance(self.__weights, Iterable):
-            return numpy.amax(numpy.abs(self.__weights))
-        n_conns = synapse_info.n_pre_neurons * synapse_info.n_post_neurons
-        return super()._get_weight_maximum(
-            self.__weights, n_conns, synapse_info)
+        return numpy.amax(numpy.abs(self.__weights))
 
     def local_only_n_bytes(self, pre_shape: tuple[int, ...],
                            n_post_atoms: int) -> int:
