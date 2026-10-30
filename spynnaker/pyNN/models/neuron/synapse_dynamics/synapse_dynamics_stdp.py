@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Iterable
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy
 from numpy import floating, integer, uint8, uint16, uint32
@@ -209,7 +209,7 @@ class SynapseDynamicsSTDP(
         return self
 
     @overrides(AbstractPlasticSynapseDynamics.get_value)
-    def get_value(self, key: str) -> Any:
+    def get_value(self, key: str) -> float:
         for obj in [self.__timing_dependence, self.__weight_dependence, self]:
             if hasattr(obj, key):
                 return getattr(obj, key)
@@ -217,7 +217,7 @@ class SynapseDynamicsSTDP(
             f"Type {type(self)} does not have parameter {key}")
 
     @overrides(AbstractPlasticSynapseDynamics.set_value)
-    def set_value(self, key: str, value: Any) -> None:
+    def set_value(self, key: str, value: float) -> None:
         for obj in [self.__timing_dependence, self.__weight_dependence, self]:
             if hasattr(obj, key):
                 setattr(obj, key, value)
