@@ -16,7 +16,6 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import (
     TYPE_CHECKING,
-    Any,
     Final,
     TypeAlias,
 )
@@ -230,7 +229,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
             Slice, tuple[NDArray[integer], NDArray[integer]]] = {}
 
     @overrides(AbstractGenerateConnectorOnMachine.get_parameters)
-    def get_parameters(self) -> dict[str, Any]:
+    def get_parameters(self) -> dict[str, object]:
         parameters = self._get_parameters()
         parameters["shape_pre"] = [self._pre_h, self._pre_w]
         parameters["shape_post"] = [self._post_h, self._post_w]

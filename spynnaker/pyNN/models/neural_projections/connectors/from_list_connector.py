@@ -19,7 +19,6 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
-    Any,
     TypeGuard,
 )
 
@@ -144,7 +143,7 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         self.__setup_using_conn_list()
 
     @overrides(AbstractConnector.get_parameters)
-    def get_parameters(self) -> dict[str, Any]:
+    def get_parameters(self) -> dict[str, object]:
         parameters = self._get_parameters()
         parameters["conn_list"] = self.conn_list
         parameters["column_names"] = self.column_names

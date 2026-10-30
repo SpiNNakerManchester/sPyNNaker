@@ -14,7 +14,6 @@
 
 from collections.abc import Callable, Iterator, Sequence
 from typing import (
-    Any,
     Literal,
     TypeAlias,
     TypeGuard,
@@ -37,7 +36,7 @@ _Items: TypeAlias = (tuple[NDArray[_ItemType], ...] | NDArray[_ItemType] |
                      tuple[list[numpy.floating], ...])
 
 
-def _is_listable(value: Any) -> TypeGuard[Sequence[Any]]:
+def _is_listable(value: object) -> TypeGuard[Sequence]:
     return hasattr(value, "__len__")
 
 
