@@ -15,10 +15,9 @@ from __future__ import annotations
 
 import functools
 import logging
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from typing import (
     TYPE_CHECKING,
-    Any,
     Literal,
     TypeAlias,
     cast,
@@ -59,7 +58,7 @@ from spynnaker.pyNN.models.populations.population import Population
 from spynnaker.pyNN.models.populations.population_view import PopulationView
 from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
     SpikeSourcePoissonVertex,
-    )
+)
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections.connectors import (
@@ -369,7 +368,7 @@ class Projection:
     @staticmethod
     def __save_callback(
             save_file: str | BaseFile,
-            metadata: dict[str, Any], holder: ConnectionHolder) -> None:
+            metadata: Mapping[str, object], holder: ConnectionHolder) -> None:
         data = holder.get_data_items()
         if isinstance(data, numpy.ndarray):
             # Convert structured array to normal numpy array
@@ -503,7 +502,7 @@ class Projection:
 
     # -----------------------------------------------------------------
 
-    def set(self, **attributes: Any) -> Never:  # @UnusedVariable
+    def set(self, **attributes: object) -> Never:  # @UnusedVariable
         """
         .. warning::
             Not implemented.

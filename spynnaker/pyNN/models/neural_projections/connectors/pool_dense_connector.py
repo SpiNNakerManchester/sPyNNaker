@@ -17,7 +17,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Sized
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, cast
 
 import numpy
 from numpy import float64, floating, integer, uint16, uint32
@@ -119,7 +119,7 @@ class PoolDenseConnector(AbstractConnector):
         self.__negative_receptor_type = negative_receptor_type
 
     @overrides(AbstractConnector.get_parameters)
-    def get_parameters(self) -> dict[str, Any]:
+    def get_parameters(self) -> dict[str, object]:
         parameters = self._get_parameters()
         parameters["weights"] = self.weights
         parameters["pool_shape"] = self.__pool_shape

@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy
 from numpy.typing import NDArray
@@ -100,7 +100,7 @@ class SmallWorldConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
                 " SmallWorldConnector on this platform")
 
     @overrides(AbstractConnector.get_parameters)
-    def get_parameters(self) -> dict[str, Any]:
+    def get_parameters(self) -> dict[str, object]:
         parameters = self._get_parameters()
         parameters["rewiring"] = self.__rewiring
         parameters["degree"] = self.__degree

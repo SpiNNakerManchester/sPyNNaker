@@ -17,7 +17,7 @@ import logging
 import math
 import re
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy
 from numpy import float64, uint8, uint16, uint32
@@ -674,7 +674,7 @@ class AbstractConnector(metaclass=AbstractBase):
                 "PopulationView on a multi-dimensional Population is not "
                 "supported")
 
-    def get_parameters(self) -> dict[str, Any]:
+    def get_parameters(self) -> dict[str, object]:
         """
         A list of parameters that would recreate this connector.
 
@@ -690,7 +690,7 @@ class AbstractConnector(metaclass=AbstractBase):
             f"{type(self)} does not implement "
             f"Standard pyNN get_parameters method")
 
-    def _get_parameters(self) -> dict[str, Any]:
+    def _get_parameters(self) -> dict[str, object]:
         """
         :return: A map of the init parameters to the values passed in.
         """
@@ -712,7 +712,7 @@ class AbstractConnector(metaclass=AbstractBase):
         params = self.get_parameters()
         logger.warning(
             f"Cloning type{self} which may lead to incorrect results.")
-        return theType(**params)
+        return theType(**params)  # type: ignore
 
     def get_unused(self) -> AbstractConnector:
         """
@@ -749,6 +749,6 @@ class AbstractConnector(metaclass=AbstractBase):
 
         :return: A human-readable description of the connector.
         """
-        context = {"Type": self.__class__.__name__}
+        context: dict[str, object] = {"Type": self.__class__.__name__}
         context.update(self.get_parameters())
         return descriptions.render(engine, template, context)
