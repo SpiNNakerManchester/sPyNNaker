@@ -18,7 +18,6 @@ import math
 from collections.abc import Collection, Sequence, Sized
 from typing import (
     TYPE_CHECKING,
-    Any,
     TypeGuard,
     cast,
 )
@@ -103,7 +102,7 @@ _MAX_OFFSET_DENOMINATOR = 10
 DURATION_FOREVER = 0xFFFFFFFF
 
 
-def _is_list_of_lists(value: Any) -> TypeGuard[
+def _is_list_of_lists(value: object) -> TypeGuard[
         Sequence[Sequence[int | float]]]:
     return isinstance(value, (Sequence, numpy.ndarray)) and isinstance(
         value[0], (Sequence, numpy.ndarray))
@@ -353,7 +352,7 @@ class SpikeSourcePoissonVertex(
         Get the rates.
         """
         # UGH! Mypy has been defeated!
-        return cast(Any, self.__data["rates"])
+        return cast(RangedList[NDArray[numpy.floating]], self.__data["rates"])
 
     def add_outgoing_projection(self, projection: Projection) -> None:
         """
@@ -649,7 +648,7 @@ class SpikeSourcePoissonVertex(
                 SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID)
 
     def describe(
-            self) -> dict[str, str | ParameterHolder | dict[str, Any]]:
+            self) -> dict[str, str | ParameterHolder | dict[str, object]]:
         """
         Return a human-readable description of the cell or synapse type.
 

@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
@@ -39,7 +39,7 @@ class AbstractEthernetSensor(metaclass=AbstractBase):
         raise NotImplementedError
 
     @abstractmethod
-    def get_injector_parameters(self) -> dict[str, Any]:
+    def get_injector_parameters(self) -> dict[str, object]:
         """
         :returns:
            The parameters of the Spike Injector to use with this device.

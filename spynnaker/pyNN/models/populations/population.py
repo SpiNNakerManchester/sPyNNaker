@@ -19,7 +19,6 @@ import os
 from collections.abc import Callable, Iterable, Iterator, Sequence
 from typing import (
     TYPE_CHECKING,
-    Any,
     TypeAlias,
     cast,
     final,
@@ -70,7 +69,7 @@ if TYPE_CHECKING:
 logger = FormatAdapter(logging.getLogger(__name__))
 _CellType: TypeAlias = AbstractPyNNModel | PopulationApplicationVertex
 _CellTypeArg: TypeAlias = type[AbstractPyNNModel] | _CellType
-_ParamDict: TypeAlias = dict[str, Any]
+_ParamDict: TypeAlias = dict[str, object]
 
 
 class Population(PopulationBase):
@@ -96,7 +95,7 @@ class Population(PopulationBase):
             initial_values: dict[str, float] | None = None,
             label: str | None = None,
             additional_parameters: _ParamDict | None = None,
-            **additional_kwargs: _ParamDict):
+            **additional_kwargs: object):
         """
         :param size: The number of neurons in the population
         :param cellclass: The implementation of the individual neurons.
@@ -140,7 +139,7 @@ class Population(PopulationBase):
         if realsize is None:
             realsize = self.__vertex.n_atoms
         self.__size = realsize
-        self.__annotations: dict[str, Any] = {}
+        self.__annotations: dict[str, object] = {}
 
         # things for pynn demands
         self.__first_id, self.__last_id = SpynnakerDataView.add_population(
@@ -172,7 +171,7 @@ class Population(PopulationBase):
             yield IDMixin(self, _id)
 
     @property
-    def annotations(self) -> dict[str, Any]:
+    def annotations(self) -> dict[str, object]:
         """
         The annotations given by the end user.
         """
@@ -220,7 +219,7 @@ class Population(PopulationBase):
     @overrides(PopulationBase.write_data)
     def write_data(self, io: str | BaseIO, variables: Names = 'all',
                    gather: bool = True, clear: bool = False,
-                   annotations: dict[str, Any] | None = None) -> None:
+                   annotations: dict[str, object] | None = None) -> None:
         self._check_params(gather, annotations)
 
         if isinstance(io, str):
@@ -238,7 +237,7 @@ class Population(PopulationBase):
 
     def describe(self, template: str = 'population_default.txt',
                  engine:  str | TemplateEngine | None = 'default'
-                 ) -> str | dict[str, Any]:
+                 ) -> str | dict[str, object]:
         """
         Returns a human-readable description of the population.
 
@@ -253,7 +252,7 @@ class Population(PopulationBase):
         :param engine: Template substitution engine
         :returns: Human-readable description as a string or dict
         """
-        context: dict[str, Any] = {
+        context: dict[str, object] = {
             "label": self.label,
             "celltype": self.celltype.describe(template=None),
             "structure": None,
@@ -293,7 +292,7 @@ class Population(PopulationBase):
     def get_data(
             self, variables: Names = 'all',
             gather: bool = True, clear: bool = False, *,
-            annotations: dict[str, Any] | None = None) -> neo.Block:
+            annotations: dict[str, object] | None = None) -> neo.Block:
         self._check_params(gather, annotations)
         return self.__recorder.extract_neo_block(
             variables, None, clear, annotations)

@@ -26,7 +26,6 @@ import logging
 import os
 from collections.abc import Callable, Iterable, Sequence
 from typing import (
-    Any,
     Literal,
     TypedDict,
     cast,
@@ -278,24 +277,24 @@ __all__ = [  # noqa: RUF022
 
 
 class __PynnOperations(TypedDict, total=False):
-    run: Callable[[float, Any], float]
-    run_until: Callable[[float, Any], float]
+    run: Callable[[float, object], float]
+    run_until: Callable[[float, object], float]
     get_current_time: Callable[[], float]
     get_time_step: Callable[[], float]
     get_max_delay: Callable[[], int]
     get_min_delay: Callable[[], int]
     num_processes: Callable[[], int]
     rank: Callable[[], int]
-    reset: Callable[[dict[str, Any]], None]
+    reset: Callable[[dict[str, object]], None]
     create: Callable[
-        [type | AbstractPyNNModel, dict[str, Any] | None, int],
+        [type | AbstractPyNNModel, dict[str, object] | None, int],
         Population]
     connect: Callable[
         [Population, Population, float, float | None, str | None, int,
          NumpyRNG | None], None]
     record: Callable[
         [str | Sequence[str], PopulationBase, str, float | None,
-         dict[str, Any] | None], Block]
+         dict[str, object] | None], Block]
 
 
 # Dynamically-extracted operations from PyNN
@@ -338,7 +337,7 @@ def setup(timestep: float | Literal["auto"] | None = None,
           time_scale_factor: int | None = None,
           n_chips_required: int | None = None,
           n_boards_required: int | None = None,
-          **extra_params: Any) -> int:
+          **extra_params: object) -> int:
     """
     The main method needed to be called to make the PyNN 0.8 setup.
     Needs to be called before any other function
@@ -482,7 +481,7 @@ def _create_overloaded_functions(spinnaker_simulator: SpiNNaker) -> None:
     __pynn["record"] = pynn_common.build_record(spinnaker_simulator)
 
 
-def end(_: Any = True) -> None:
+def end(_: object = True) -> None:
     """
     Cleans up the SpiNNaker machine and software
 
@@ -612,7 +611,7 @@ def connect(pre: Population, post: Population, weight: float = 0.0,
 
 def create(
         cellclass: type | AbstractPyNNModel,
-        cellparams: dict[str, Any] | None = None,
+        cellparams: dict[str, object] | None = None,
         n: int = 1) -> Population:
     """
     Builds a population with certain parameters.
@@ -681,7 +680,7 @@ def get_time_step() -> float:
     return float(__pynn["get_time_step"]())
 
 
-def initialize(cells: PopulationBase, **initial_values: Any) -> None:
+def initialize(cells: PopulationBase, **initial_values: object) -> None:
     """
     Sets cells to be initialised to the given values.
 
@@ -720,7 +719,7 @@ def rank() -> int:
 
 def record(variables: str | Sequence[str], source: PopulationBase,
            filename: str, sampling_interval: float | None = None,
-           annotations: dict[str, Any] | None = None) -> Block:
+           annotations: dict[str, object] | None = None) -> Block:
     """
     Sets variables to be recorded.
 
@@ -739,7 +738,7 @@ def record(variables: str | Sequence[str], source: PopulationBase,
                             annotations)
 
 
-def reset(annotations: dict[str, Any] | None = None) -> None:
+def reset(annotations: dict[str, object] | None = None) -> None:
     """
     Resets the simulation to t = 0.
 

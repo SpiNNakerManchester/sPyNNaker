@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from collections.abc import Mapping, Sequence
-from typing import Any, Final
+from typing import Final
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged.range_dictionary import RangeDictionary
@@ -198,7 +198,7 @@ class NeuronImplStandard(AbstractNeuronImpl):
     def is_conductance_based(self) -> bool:
         return isinstance(self.__input_type, InputTypeConductance)
 
-    def __getitem__(self, key: str) -> Any:
+    def __getitem__(self, key: str) -> object:
         # Find the property in the components...
         for component in self.__components:
             if hasattr(component, key):

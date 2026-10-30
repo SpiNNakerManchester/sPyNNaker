@@ -17,7 +17,6 @@ import logging
 from collections.abc import Callable, Sequence
 from typing import (
     TYPE_CHECKING,
-    Any,
     final,
 )
 
@@ -91,7 +90,7 @@ class PopulationBase(metaclass=AbstractBase):
     def get_data(
             self, variables: Names = 'all',
             gather: bool = True, clear: bool = False, *,
-            annotations: dict[str, Any] | None = None) -> neo.Block:
+            annotations: dict[str, object] | None = None) -> neo.Block:
         """
         Return a Neo Block containing the data(spikes, state variables)
         recorded from the Population.
@@ -183,8 +182,7 @@ class PopulationBase(metaclass=AbstractBase):
         return sum(counts.values()) / len(counts)
 
     @final
-    def nearest(
-            self, position: Any) -> Never:
+    def nearest(self, position: object) -> Never:
         """
         Return the neuron closest to the specified position.
 
@@ -216,7 +214,7 @@ class PopulationBase(metaclass=AbstractBase):
     def write_data(self, io: str | neo.baseio.BaseIO,
                    variables: Names = 'all',
                    gather: bool = True, clear: bool = False,
-                   annotations: dict[str, Any] | None = None) -> None:
+                   annotations: dict[str, object] | None = None) -> None:
         """
         Write recorded data to file, using one of the file formats
         supported by Neo.
@@ -268,7 +266,7 @@ class PopulationBase(metaclass=AbstractBase):
         raise NotImplementedError
 
     @final
-    def save_positions(self, file: Any) -> Never:  # pylint: disable=W0622
+    def save_positions(self, file: object) -> Never:  # pylint: disable=W0622
         """
         Save positions to file. The output format is index x y z
 
@@ -312,7 +310,7 @@ class PopulationBase(metaclass=AbstractBase):
 
     @staticmethod
     def _check_params(gather: bool,
-                      annotations: dict[str, Any] | None = None) -> None:
+                      annotations: dict[str, object] | None = None) -> None:
         if not gather:
             logger.warning(
                 "sPyNNaker only supports gather=True. We will run "
