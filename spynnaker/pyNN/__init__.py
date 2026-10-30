@@ -86,8 +86,6 @@ from spynnaker.pyNN.models.current_sources.step_current_source import (
 # connections
 # noinspection PyUnresolvedReferences
 from spynnaker.pyNN.models.neural_projections.connectors. \
-    abstract_connector import AbstractConnector
-from spynnaker.pyNN.models.neural_projections.connectors. \
     all_to_all_connector import AllToAllConnector
 from spynnaker.pyNN.models.neural_projections.connectors. \
     array_connector import ArrayConnector
@@ -178,8 +176,6 @@ from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
     .partner_selection.last_neuron_selection import LastNeuronSelection
 from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis \
     .partner_selection.random_selection import RandomSelection
-from spynnaker.pyNN.models.neuron.synapse_dynamics. \
-    abstract_synapse_dynamics import AbstractSynapseDynamics
 
 # synapse structures
 from spynnaker.pyNN.models.neuron.synapse_dynamics. \
@@ -209,7 +205,7 @@ from spynnaker.pyNN.models.populations.population_view import (
 
 # projection
 # noinspection PyUnresolvedReferences
-from spynnaker.pyNN.models.projection import Projection as SpiNNakerProjection
+from spynnaker.pyNN.models.projection import Projection
 
 # noinspection PyUnresolvedReferences
 from spynnaker.pyNN.models.spike_source.spike_source_array import (
@@ -225,7 +221,6 @@ from spynnaker.pyNN.setup_pynn import setup_pynn
 
 # big stuff
 from spynnaker.pyNN.spinnaker import SpiNNaker
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 #: The timestep to use of "auto" is specified as a timestep
 SPYNNAKER_AUTO_TIMESTEP = 1.0
@@ -260,8 +255,6 @@ __all__ = [  # noqa: RUF022
     'Izhikevich', 'SpikeSourceArray', 'SpikeSourcePoisson',
     # pops
     'Assembly', 'Population', 'PopulationView',
-    # projection
-    'SpiNNakerProjection',
     # External devices and extra models
     'external_devices', 'extra_models',
     # CurrentSources
@@ -421,38 +414,6 @@ def name() -> str:
     :returns: The name of the simulator.
     """
     return SpynnakerDataView.get_sim_name()
-
-
-def Projection(
-        presynaptic_population: Population,
-        postsynaptic_population: Population,
-        connector: AbstractConnector,
-        synapse_type: AbstractSynapseDynamics | None = None,
-        source: None = None, receptor_type: str = "excitatory",
-        space: Space | None = None, label: str | None = None,
-        download_synapses: bool = False,
-        partition_id: str = SPIKE_PARTITION_ID) -> SpiNNakerProjection:
-    """
-    Used to support PEP 8 spelling correctly.
-
-    :param presynaptic_population: the source pop
-    :param postsynaptic_population: the destination population
-    :param connector: the connector type
-    :param synapse_type: the synapse type
-    :param source: Unsupported; must be ``None``
-    :param receptor_type: the receptor type
-    :param space: the space object
-    :param label: the label
-    :param download_synapses: whether to download synapses
-    :param partition_id: the partition id to use for the projection
-    :return: a projection object for SpiNNaker
-    """
-    return SpiNNakerProjection(
-        pre_synaptic_population=presynaptic_population,
-        post_synaptic_population=postsynaptic_population, connector=connector,
-        synapse_type=synapse_type, source=source, receptor_type=receptor_type,
-        space=space, label=label, download_synapses=download_synapses,
-        partition_id=partition_id)
 
 
 def _create_overloaded_functions(spinnaker_simulator: SpiNNaker) -> None:
