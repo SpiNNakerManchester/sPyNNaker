@@ -18,7 +18,6 @@ from collections import defaultdict
 from collections.abc import Sequence
 from typing import (
     TYPE_CHECKING,
-    Any,
     ClassVar,
     cast,
 )
@@ -54,7 +53,7 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
     _model_created = False
 
     # Using new as most super classes do not call the init
-    def __new__(cls, *args: Any, **kwargs: Any) -> Self:
+    def __new__(cls, *args: object, **kwargs: object) -> Self:
         _ = (args, kwargs)
         AbstractPyNNModel._model_created = True
         return super().__new__(cls)
@@ -172,10 +171,10 @@ class AbstractPyNNModel(AbstractProvidesDefaults, metaclass=AbstractBase):
     #: The default values for the parameters at the population level.
     #: These are parameters that can be passed in to the Population
     #: constructor in addition to the standard PyNN options.
-    default_population_parameters: dict[str, Any] = {}  # NOQA RUF102
+    default_population_parameters: dict[str, object] = {}  # NOQA RUF102
 
     @classmethod
-    def _get_default_population_parameters(cls) -> dict[str, Any]:
+    def _get_default_population_parameters(cls) -> dict[str, object]:
         """
         Get the default population parameters.
         Slightly contorted to allow for overriding class variables.

@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any
 
 from spinn_utilities.overrides import overrides
 
@@ -73,7 +72,7 @@ class PushBotEthernetRetinaDevice(
         return self.__n_neurons
 
     @overrides(AbstractEthernetSensor.get_injector_parameters)
-    def get_injector_parameters(self) -> dict[str, Any]:
+    def get_injector_parameters(self) -> dict[str, object]:
         return {"port": self.__injector_port}
 
     @overrides(AbstractEthernetSensor.get_injector_label)

@@ -15,7 +15,7 @@
 import logging
 import os
 from collections.abc import Collection
-from typing import Any, Literal, cast
+from typing import Literal, cast
 
 from lazyarray import __version__ as lazyarray_version
 from neo import __version__ as neo_version
@@ -280,7 +280,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         return self.__writer.get_simulation_time_step_ms()
 
     @dt.setter
-    def dt(self, _: Any) -> Never:
+    def dt(self, _: object) -> Never:
         """
         We do not support setting the time step except during setup.
 
@@ -308,7 +308,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         return self.__writer.get_reset_number()
 
     @segment_counter.setter
-    def segment_counter(self, _: Any) -> Never:
+    def segment_counter(self, _: object) -> Never:
         """
         We do not support externally altering the segment counter
 

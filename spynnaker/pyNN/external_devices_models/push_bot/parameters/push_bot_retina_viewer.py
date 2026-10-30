@@ -14,7 +14,6 @@
 import logging
 from threading import RLock, Thread
 from time import sleep
-from typing import Any
 
 import numpy
 from matplotlib import pyplot
@@ -139,7 +138,7 @@ class PushBotRetinaViewer:
         except Exception:  # pylint: disable=broad-except
             _logger.exception("unexpected exception in drawing thread")
 
-    def __on_close(self, event: Any) -> None:
+    def __on_close(self, event: object) -> None:
         _ = event
         self.__running = False
 

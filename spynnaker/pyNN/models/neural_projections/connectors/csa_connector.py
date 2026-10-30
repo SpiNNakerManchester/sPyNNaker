@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy
 from numpy.typing import NDArray
@@ -87,7 +87,7 @@ class CSAConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         self.__full_cset: list[CSet] | None = None
 
     @overrides(AbstractConnector.get_parameters)
-    def get_parameters(self) -> dict[str, Any]:
+    def get_parameters(self) -> dict[str, object]:
         parameters = self._get_parameters()
         parameters["cset"] = self.__cset
         return parameters

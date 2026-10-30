@@ -13,7 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, ClassVar
 
 from spinn_utilities.overrides import overrides
 
@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 # make it easier when all-to-all-connector is used
 DEFAULT_MAX_ATOMS_PER_CORE = POP_TABLE_MAX_ROW_LENGTH
 
-_population_parameters: dict[str, Any] = {
+_population_parameters: dict[str, object] = {
     "spikes_per_second": None, "ring_buffer_sigma": None,
     "max_expected_summed_weight": None,
     "incoming_spike_buffer_size": None, "drop_late_spikes": None,

@@ -14,10 +14,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Sequence
-from typing import (
-    TYPE_CHECKING,
-    Any,
-)
+from typing import TYPE_CHECKING
 
 import numpy
 from pyNN.standardmodels.synapses import StaticSynapse
@@ -164,7 +161,7 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
         self.__connections: ConnectionsInfo = {}
 
         self.__rng = numpy.random.RandomState(seed)
-        self.__seeds: dict[Any, tuple[int, ...]] = {}
+        self.__seeds: dict[object, tuple[int, ...]] = {}
 
     @overrides(AbstractStaticSynapseDynamics.merge)
     def merge(self, synapse_dynamics: AbstractSynapseDynamics

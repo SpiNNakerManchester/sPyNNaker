@@ -18,7 +18,6 @@ import logging
 from collections.abc import Callable, Sequence
 from typing import (
     TYPE_CHECKING,
-    Any,
     Literal,
     TypeAlias,
     cast,
@@ -58,7 +57,7 @@ from spynnaker.pyNN.models.populations.population import Population
 from spynnaker.pyNN.models.populations.population_view import PopulationView
 from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
     SpikeSourcePoissonVertex,
-    )
+)
 
 if TYPE_CHECKING:
     from spynnaker.pyNN.models.neural_projections.connectors import (
@@ -369,7 +368,7 @@ class Projection:
             format == "list", data_items, fixed_values, notify=notify)
 
     @staticmethod
-    def __save_callback(save_file: str, metadata: dict[str, Any],
+    def __save_callback(save_file: str,  metadata: dict[str, object],
                         holder: ConnectionHolder) -> None:
         data = holder.get_data_items()
         if isinstance(data, numpy.ndarray):
@@ -500,7 +499,7 @@ class Projection:
 
     # -----------------------------------------------------------------
 
-    def set(self, **attributes: Any) -> Never:  # @UnusedVariable
+    def set(self, **attributes: object) -> Never:  # @UnusedVariable
         """
         .. warning::
             Not implemented.
