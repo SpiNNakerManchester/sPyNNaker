@@ -18,12 +18,7 @@ import math
 import os
 from collections import defaultdict
 from collections.abc import Collection, Iterable, Sequence
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    TypeGuard,
-    cast,
-)
+from typing import TYPE_CHECKING, TypeGuard, cast
 
 import numpy
 from numpy.typing import NDArray
@@ -468,7 +463,7 @@ class PopulationVertex(
             raise PacmanConfigurationException(
                 f"The splitter object on {self._label} must be set to one "
                 "capable of handling an PopulationVertex.")
-        self._splitter = cast(Any, splitter)
+        self._splitter = splitter
         splitter.set_governed_app_vertex(self)
 
     @overrides(PopulationApplicationVertex.get_max_atoms_per_core)
@@ -1320,7 +1315,7 @@ class PopulationVertex(
         """
         self.__connection_cache.clear()
 
-    def describe(self) -> dict[str, str | dict[str, Any]]:
+    def describe(self) -> dict[str, str | dict[str, object]]:
         """
         :returns: A human-readable description of vertex and its parameters
         """

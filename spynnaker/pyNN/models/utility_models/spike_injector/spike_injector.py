@@ -21,7 +21,7 @@ from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
 from .spike_injector_vertex import SpikeInjectorVertex
 
-_population_parameters = {
+_population_parameters: dict[str, object] = {
     "port": None,
     "virtual_key": None,
     "reserve_reverse_ip_tag": False,

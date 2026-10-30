@@ -79,7 +79,7 @@ class TestConnectors(unittest.TestCase):
     def testOneToOneConnector_defaults(self) -> None:
         connector = OneToOneConnector()
         params = connector.get_parameters()
-        connector2 = OneToOneConnector(**params)
+        connector2 = OneToOneConnector(**params)  # type: ignore
         assert connector2.get_parameters() == params
         self.compare_connectors(connector, connector2)
         connector3 = connector.clone()
@@ -89,7 +89,7 @@ class TestConnectors(unittest.TestCase):
     def testOneToOneConnector_not_defaults(self) -> None:
         connector = OneToOneConnector(safe=False, verbose=True)
         params = connector.get_parameters()
-        connector2 = OneToOneConnector(**params)
+        connector2 = OneToOneConnector(**params)  # type: ignore
         assert connector2.get_parameters() == params
         assert connector2.safe is False
         assert connector2.verbose is True
@@ -102,7 +102,7 @@ class TestConnectors(unittest.TestCase):
         weights = numpy.ones((2, 2))
         connector = AllButMeConnector(n_neurons_per_group=2, weights=weights)
         params = connector.get_parameters()
-        connector2 = AllButMeConnector(**params)
+        connector2 = AllButMeConnector(**params)  # type: ignore
         assert connector2.get_parameters() == params
         self.compare_connectors(connector, connector2)
         connector3 = connector.clone()
@@ -111,7 +111,7 @@ class TestConnectors(unittest.TestCase):
     def testAllToAllConnector(self) -> None:
         connector = AllToAllConnector(allow_self_connections=False)
         params = connector.get_parameters()
-        connector2 = AllToAllConnector(**params)
+        connector2 = AllToAllConnector(**params)  # type: ignore
         assert connector2.get_parameters() == params
         assert connector2.allow_self_connections is False
         self.compare_connectors(connector, connector2)
@@ -122,7 +122,7 @@ class TestConnectors(unittest.TestCase):
         array = numpy.array([[1, 2, 3], [4, 5, 6]])
         connector = ArrayConnector(array)
         params = connector.get_parameters()
-        connector2 = ArrayConnector(**params)
+        connector2 = ArrayConnector(**params)  # type: ignore
         assert connector2.get_parameters() == params
         self.compare_connectors(connector, connector2)
         connector3 = connector.clone()
@@ -134,7 +134,7 @@ class TestConnectors(unittest.TestCase):
             5, allow_self_connections=False, with_replacement=True,
             rng=rng)
         params = connector.get_parameters()
-        connector2 = FixedNumberPostConnector(**params)
+        connector2 = FixedNumberPostConnector(**params)  # type: ignore
         assert connector2.get_parameters() == params
         assert connector2.allow_self_connections is False
         self.compare_connectors(connector, connector2)
@@ -147,7 +147,7 @@ class TestConnectors(unittest.TestCase):
             7, allow_self_connections=False, with_replacement=True,
             rng=rng)
         params = connector.get_parameters()
-        connector2 = FixedNumberPreConnector(**params)
+        connector2 = FixedNumberPreConnector(**params)  # type: ignore
         assert connector2.get_parameters() == params
         assert connector2.allow_self_connections is False
         self.compare_connectors(connector, connector2)
@@ -159,7 +159,7 @@ class TestConnectors(unittest.TestCase):
         connector = FixedProbabilityConnector(
             0.5, allow_self_connections=False, rng=rng)
         params = connector.get_parameters()
-        connector2 = FixedProbabilityConnector(**params)
+        connector2 = FixedProbabilityConnector(**params)  # type: ignore
         assert connector2.get_parameters() == params
         assert connector2.p_connect == 0.5
         self.compare_connectors(connector, connector2)
@@ -188,7 +188,7 @@ class TestConnectors(unittest.TestCase):
                 pre_start_coords_in_post=pre_start,
                 post_start_coords_in_pre=post_start)
         params = connector.get_parameters()
-        connector2 = KernelConnector(**params)
+        connector2 = KernelConnector(**params)  # type: ignore
         params2 = connector2.get_parameters()
         self.compare_parameters(params, params2)
         self.compare_connectors(connector, connector2)
@@ -201,7 +201,7 @@ class TestConnectors(unittest.TestCase):
             4, allow_self_connections=False, with_replacement=False,
             rng=rng)
         params = connector.get_parameters()
-        connector2 = MultapseConnector(**params)
+        connector2 = MultapseConnector(**params)  # type: ignore
         assert connector2.get_parameters() == params
         self.compare_connectors(connector, connector2)
         connector3 = connector.clone()
@@ -211,7 +211,7 @@ class TestConnectors(unittest.TestCase):
         connector = OneToOneOffsetConnector(
             offset=5, wrap=True, n_neurons_per_group=4)
         params = connector.get_parameters()
-        connector2 = OneToOneOffsetConnector(**params)
+        connector2 = OneToOneOffsetConnector(**params)  # type: ignore
         assert connector2.get_parameters() == params
         self.compare_connectors(connector, connector2)
         connector3 = connector.clone()
@@ -223,7 +223,7 @@ class TestConnectors(unittest.TestCase):
             k_shape)) - (numpy.prod(k_shape) / 2)).reshape(k_shape) * 0.1
         connector = ConvolutionConnector(kernel)
         params = connector.get_parameters()
-        connector2 = ConvolutionConnector(**params)
+        connector2 = ConvolutionConnector(**params)  # type: ignore
         self.compare_parameters(params, connector2.get_parameters())
         self.compare_connectors(connector, connector2)
         connector3 = connector.clone()
@@ -242,7 +242,7 @@ class TestConnectors(unittest.TestCase):
             positive_receptor_type="gigo1", negative_receptor_type="gigo2",
             filter_edges=False)
         params = connector.get_parameters()
-        connector2 = ConvolutionConnector(**params)
+        connector2 = ConvolutionConnector(**params)  # type: ignore
         self.compare_parameters(params, connector2.get_parameters())
         self.compare_connectors(connector, connector2)
         connector3 = connector.clone()
@@ -252,7 +252,7 @@ class TestConnectors(unittest.TestCase):
     def testCSAConnector(self) -> None:
         connector = CSAConnector(csa.oneToOne)
         params = connector.get_parameters()
-        connector2 = CSAConnector(**params)
+        connector2 = CSAConnector(**params)  # type: ignore
         self.compare_parameters(params, connector2.get_parameters())
         self.compare_connectors(connector, connector2)
         connector3 = connector.clone()
@@ -264,7 +264,8 @@ class TestConnectors(unittest.TestCase):
             d_expression="gigo", allow_self_connections=False,
             n_connections=None, rng=rng)
         params = connector.get_parameters()
-        connector2 = DistanceDependentProbabilityConnector(**params)
+        connector2 = DistanceDependentProbabilityConnector(
+            **params)  # type: ignore
         assert connector2.get_parameters() == params
         self.compare_connectors(connector, connector2)
         connector3 = connector.clone()
@@ -274,7 +275,7 @@ class TestConnectors(unittest.TestCase):
         from_list: list[tuple[int, ...]] = [(1, 2), (3, 4), (5, 6)]
         connector = FromListConnector(from_list)
         params = connector.get_parameters()
-        connector2 = FromListConnector(**params)
+        connector2 = FromListConnector(**params)  # type: ignore
         self.compare_parameters(params, connector2.get_parameters())
         self.compare_connectors(connector, connector2)
         connector3 = connector.clone()
@@ -284,7 +285,7 @@ class TestConnectors(unittest.TestCase):
         from_list: list[tuple[int, ...]] = [(1, 2, 3), (4, 5, 6)]
         connector = FromListConnector(from_list, ["weight"])
         params = connector.get_parameters()
-        connector2 = FromListConnector(**params)
+        connector2 = FromListConnector(**params)  # type: ignore
         self.compare_parameters(params, connector2.get_parameters())
         self.compare_connectors(connector, connector2)
         connector3 = connector.clone()
@@ -298,7 +299,7 @@ class TestConnectors(unittest.TestCase):
         connector = FromFileConnector(name)
         params = connector.get_parameters()
         # FromFileConnector return FromListConnector Params
-        connector2 = FromListConnector(**params)
+        connector2 = FromListConnector(**params)  # type: ignore
         self.compare_parameters(params, connector2.get_parameters())
         self.compare_values(
             "conn_list", connector.conn_list, connector2.conn_list)
@@ -313,7 +314,7 @@ class TestConnectors(unittest.TestCase):
             index_expression="gigo", allow_self_connections=False,
             rng=rng)
         params = connector.get_parameters()
-        connector2 = IndexBasedProbabilityConnector(**params)
+        connector2 = IndexBasedProbabilityConnector(**params)  # type: ignore
         assert connector2.get_parameters() == params
         self.compare_connectors(connector, connector2)
         connector3 = connector.clone()
@@ -327,7 +328,7 @@ class TestConnectors(unittest.TestCase):
         connector = PoolDenseConnector(
             [0, 200, 0], shape, stride, "gigo1", "gigo2")
         params = connector.get_parameters()
-        connector2 = PoolDenseConnector(**params)
+        connector2 = PoolDenseConnector(**params)  # type: ignore
         self.compare_parameters(params, connector2.get_parameters())
         self.compare_connectors(connector, connector2)
         connector3 = connector.clone()
@@ -340,7 +341,7 @@ class TestConnectors(unittest.TestCase):
         rng = NumpyRNG(seed=13)
         connector = SmallWorldConnector(1.2, 3.4, True, None, rng)
         params = connector.get_parameters()
-        connector2 = SmallWorldConnector(**params)
+        connector2 = SmallWorldConnector(**params)  # type: ignore
         self.compare_parameters(params, connector2.get_parameters())
         self.compare_connectors(connector, connector2)
         connector3 = connector.clone()

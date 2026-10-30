@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy
 from numpy import int32, uint32
@@ -92,7 +92,7 @@ class OneToOneOffsetConnector(
         self.__wrap = wrap
 
     @overrides(AbstractGenerateConnectorOnMachine.get_parameters)
-    def get_parameters(self) -> dict[str, Any]:
+    def get_parameters(self) -> dict[str, object]:
         parameters = self._get_parameters()
         parameters["n_neurons_per_group"] = self.__n_neurons_per_group
         parameters["offset"] = self.__offset

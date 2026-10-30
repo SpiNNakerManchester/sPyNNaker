@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy
 from numpy import uint32
@@ -71,7 +71,7 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
         self.__allow_self_connections = allow_self_connections
 
     @overrides(AbstractGenerateConnectorOnMachine.get_parameters)
-    def get_parameters(self) -> dict[str, Any]:
+    def get_parameters(self) -> dict[str, object]:
         parameters = self._get_parameters()
         parameters["allow_self_connections"] = self.allow_self_connections
         return parameters
