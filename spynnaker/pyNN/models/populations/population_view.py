@@ -18,7 +18,6 @@ import os
 from collections.abc import Callable, Iterable, Iterator, Sequence
 from typing import (
     TYPE_CHECKING,
-    Any,
     overload,
 )
 
@@ -119,7 +118,7 @@ class PopulationView(PopulationBase):
         if label is None:
             label = f"{parent.label}:{selector}"
         self.__label = label
-        self.__annotations: dict[str, Any] = {}
+        self.__annotations: dict[str, object] = {}
 
         # Get these two objects to make access easier
         # pylint: disable=protected-access
@@ -301,10 +300,11 @@ class PopulationView(PopulationBase):
         :param engine: Template substitution engine
         :returns: A human-readable description of the population view.
         """
-        context = {"label": self.label,
-                   "parent": self.parent.label,
-                   "mask": self.mask,
-                   "size": self.size}
+        context: dict[str, object] = {
+            "label": self.label,
+            "parent": self.parent.label,
+            "mask": self.mask,
+            "size": self.size}
         context.update(self.__annotations)
         return descriptions.render(engine, template, context)
 
@@ -349,7 +349,7 @@ class PopulationView(PopulationBase):
     def get_data(
             self, variables: Names = 'all',
             gather: bool = True, clear: bool = False, *,
-            annotations: dict[str, Any] | None = None) -> neo.Block:
+            annotations: dict[str, object] | None = None) -> neo.Block:
         """
         Return a Neo Block containing the data(spikes, state variables)
         recorded from the Population.
@@ -562,7 +562,7 @@ class PopulationView(PopulationBase):
     def write_data(self, io: str | neo.baseio.BaseIO,
                    variables: Names = 'all',
                    gather: bool = True, clear: bool = False,
-                   annotations: dict[str, Any] | None = None) -> None:
+                   annotations: dict[str, object] | None = None) -> None:
         if not gather:
             logger.warning("SpiNNaker only supports gather=True. We will run "
                            "as if gather was set to True.")

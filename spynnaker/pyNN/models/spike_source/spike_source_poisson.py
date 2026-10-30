@@ -23,7 +23,7 @@ from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
 from .spike_source_poisson_vertex import SpikeSourcePoissonVertex
 
-_population_parameters = {
+_population_parameters: dict[str, object] = {
     "seed": None, "max_rate": None, "splitter": None,
     "n_colour_bits": None, "neurons_per_core": None}
 

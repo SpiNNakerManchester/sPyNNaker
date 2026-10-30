@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Any, TypeAlias, cast
+from typing import TypeAlias, cast
 
 import numpy
 from numpy import int32, uint32
@@ -87,7 +87,7 @@ def param_generator_id(value: _ParamType) -> int:
     raise TypeError(f"Ungeneratable parameter {value}")
 
 
-def is_param_generatable(value: Any) -> bool:
+def is_param_generatable(value: object) -> bool:
     """
     :param value: The value to examine the type of.
     :return: Whether the value is of a type that can be generated on chip.

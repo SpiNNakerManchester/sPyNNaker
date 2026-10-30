@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy
 from numpy import floating, integer, uint32
@@ -61,7 +61,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
     __slots__ = ()
 
     @overrides(AbstractGenerateConnectorOnMachine.get_parameters)
-    def get_parameters(self) -> dict[str, Any]:
+    def get_parameters(self) -> dict[str, object]:
         return self._get_parameters()
 
     @overrides(AbstractConnector.get_delay_maximum)
