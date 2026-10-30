@@ -14,7 +14,6 @@
 
 from .abstract_accepts_incoming_synapses import AbstractAcceptsIncomingSynapses
 from .abstract_has_delay_stages import AbstractHasDelayStages
-from .abstract_max_spikes import AbstractMaxSpikes
 from .abstract_neuron_expandable import (
     NEURON_EXPANDER_APLX,
     AbstractNeuronExpandable,
@@ -37,7 +36,6 @@ __all__ = [
     "SYNAPSE_EXPANDER_APLX",
     "AbstractAcceptsIncomingSynapses",
     "AbstractHasDelayStages",
-    "AbstractMaxSpikes",
     "AbstractNeuronExpandable",
     "AbstractSynapseExpandable",
     "ColouredApplicationVertex",
