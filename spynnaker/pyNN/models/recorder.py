@@ -15,10 +15,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Collection, Mapping, Sequence
-from typing import (
-    TYPE_CHECKING,
-    Any,
-)
+from typing import TYPE_CHECKING
 
 import neo  # type: ignore[import]
 
@@ -214,7 +211,7 @@ class Recorder:
 
     def extract_neo_block(
             self, variables: Names, view_indexes: Sequence[int] | None,
-            clear: bool, annotations: dict[str, Any] | None) -> neo.Block:
+            clear: bool, annotations: dict[str, object] | None) -> neo.Block:
         """
         Extracts block from the vertices and puts them into a Neo block.
 
@@ -242,7 +239,7 @@ class Recorder:
     def write_data(
             self, csv_file: str, variables: Names | None,
             view_indexes: Sequence[int] | None = None,
-            annotations: dict[str, Any] | None = None) -> None:
+            annotations: dict[str, object] | None = None) -> None:
         """
         Extracts block from the vertices and puts them into a Neo block.
 
@@ -292,7 +289,7 @@ class Recorder:
     def __append_current_segment(
             self, block: neo.Block, variables: Names,
             view_indexes: Sequence[int] | None, clear: bool,
-            annotations: dict[str, Any] | None) -> neo.Block:
+            annotations: dict[str, object] | None) -> neo.Block:
         """
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
@@ -322,7 +319,7 @@ class Recorder:
             self, block: neo.Block | None, segment_number: int,
             variables: Names, view_indexes: Sequence[int] | None,
             clear: bool,
-            annotations: dict[str, Any] | None) -> neo.Block | None:
+            annotations: dict[str, object] | None) -> neo.Block | None:
         """
         :raises \
             ~spinn_front_end_common.utilities.exceptions.ConfigurationException:

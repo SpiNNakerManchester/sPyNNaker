@@ -20,10 +20,7 @@ import inspect
 import logging
 from collections.abc import Callable, Iterable, Mapping
 from types import MappingProxyType
-from typing import (
-    Any,
-    no_type_check,
-)
+from typing import no_type_check
 
 from spinn_utilities.classproperty import classproperty
 from spinn_utilities.log import FormatAdapter
@@ -47,7 +44,7 @@ def _check_args(
 def get_map_from_init(
         init_method: Callable,
         skip: frozenset[str] | None = None,
-        include: frozenset[str] | None = None) -> Mapping[str, Any]:
+        include: frozenset[str] | None = None) -> Mapping[str, object]:
     """
     Get an argument initialisation dictionary by examining an
     ``__init__`` method or function.
@@ -100,7 +97,7 @@ def default_parameters(parameters: Iterable[str]) -> Callable:
             frozenset(parameters))
         method_args = inspect.getfullargspec(method)
 
-        def wrapper(*args: Any, **kwargs: Any) -> None:
+        def wrapper(*args: object, **kwargs: object) -> None:
             # Check for state variables that have been specified in cell_params
             args_provided = method_args.args[:len(args)]
             args_provided.extend([
@@ -147,7 +144,7 @@ def default_initial_values(state_variables: Iterable[str]) -> Callable:
             frozenset(state_variables))
         method_args = inspect.getfullargspec(method)
 
-        def wrapper(*args: Any, **kwargs: Any) -> None:
+        def wrapper(*args: object, **kwargs: object) -> None:
             # Check for state variables that have been specified in cell_params
             args_provided = method_args.args[:len(args)]
             args_provided.extend([
@@ -220,8 +217,8 @@ class AbstractProvidesDefaults:
     @default_initial_values decorators with values read from the init.
     """
 
-    __cashed_defaults: Mapping[str, Any] | None = None
-    __cashed_initials: Mapping[str, Any] | None = None
+    __cashed_defaults: Mapping[str, object] | None = None
+    __cashed_initials: Mapping[str, object] | None = None
 
     @classmethod
     def __fill_in_defaults(cls) -> None:
@@ -280,7 +277,7 @@ class AbstractProvidesDefaults:
 
     @classproperty
     def default_parameters(  # pylint: disable=no-self-argument
-            cls) -> Mapping[str, Any]:
+            cls) -> Mapping[str, object]:
         """
         Get the default values for the parameters of the model.
 
@@ -300,7 +297,7 @@ class AbstractProvidesDefaults:
 
     @classproperty
     def default_initial_values(  # pylint: disable=no-self-argument
-            cls) -> Mapping[str, Any]:
+            cls) -> Mapping[str, object]:
         """
         Get the default initial values for the state variables of the model.
 

@@ -26,7 +26,7 @@ from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
 from .spike_source_poisson_vertex import SpikeSourcePoissonVertex
 
-_population_parameters = {"seed": None, "splitter": None}
+_population_parameters: dict[str, object] = {"seed": None, "splitter": None}
 
 DEFAULT_MAX_ATOMS_PER_CORE = 500
 

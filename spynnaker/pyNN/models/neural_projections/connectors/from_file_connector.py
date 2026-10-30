@@ -14,7 +14,6 @@
 
 import logging
 import os
-from typing import Any
 
 import numpy
 from numpy.typing import NDArray
@@ -98,10 +97,10 @@ class FromFileConnector(FromListConnector):
         logger.warning(
             "Cloning FromFileConnector as a FromListConnector "
             "which may lead to incorrect results.")
-        return FromListConnector(**params)
+        return FromListConnector(**params)    # type: ignore
 
     @overrides(FromListConnector.get_parameters)
-    def get_parameters(self) -> dict[str, Any]:
+    def get_parameters(self) -> dict[str, object]:
         logger.warning("FromFileConnectors parameters are actually the ones "
                        "for the underlying FromListConnector")
         return super().get_parameters()

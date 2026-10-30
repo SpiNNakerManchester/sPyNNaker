@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy
 from numpy import (
@@ -124,7 +124,7 @@ class IndexBasedProbabilityConnector(AbstractConnector,
         self.__probs: NDArray | None = None
 
     @overrides(AbstractConnector.get_parameters)
-    def get_parameters(self) -> dict[str, Any]:
+    def get_parameters(self) -> dict[str, object]:
         parameters = self._get_parameters()
         parameters["index_expression"] = self.index_expression
         parameters["allow_self_connections"] = self.__allow_self_connections

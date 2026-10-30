@@ -18,7 +18,6 @@ from collections import Counter
 from collections.abc import Collection, Sequence
 from typing import (
     TYPE_CHECKING,
-    Any,
     TypeAlias,
     TypeGuard,
 )
@@ -360,7 +359,7 @@ class SpikeSourceArrayVertex(
             raise KeyError(f"Cannot record {name}")
 
     def describe(
-            self) -> dict[str, str | ParameterHolder | dict[str, Any]]:
+            self) -> dict[str, str | ParameterHolder | dict[str, object]]:
         """
         Returns a human-readable description of the cell or synapse type.
 
