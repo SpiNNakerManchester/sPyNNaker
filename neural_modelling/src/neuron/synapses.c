@@ -234,17 +234,19 @@ static inline bool process_fixed_synapses(
         // The addition of the masked time to the delay even with the mask might
         // overflow into the weight at worst but can't affect the lower bits.
         uint32_t ring_buffer_index = (synaptic_word + masked_time) & ring_buffer_mask;
-        uint32_t weight = synapse_row_sparse_weight(synaptic_word);
+        int32_t weight = synapse_row_sparse_weight(synaptic_word);
 
         // Add weight to current ring buffer value
-        uint32_t accumulation = ring_buffers[ring_buffer_index] + weight;
+        int32_t accumulation = ring_buffers[ring_buffer_index] + weight;
+        // TODO: switch to saturated arithmetic to avoid complicated saturation check,
+        //       will it check saturation at both ends?
 
         // If any of bits 31-17 are set, saturate accumulator at UINT16_MAX (0xFFFF)
-        uint32_t sat_test = accumulation & sat_flag;
-        if (sat_test) {
-            accumulation = sat_value;
-            synapses_saturation_count++;
-        }
+//        uint32_t sat_test = accumulation & sat_flag;
+//        if (sat_test) {
+//            accumulation = sat_value;
+//            synapses_saturation_count++;
+//        }
 
         // Store saturated value back in ring-buffer
         ring_buffers[ring_buffer_index] = accumulation;

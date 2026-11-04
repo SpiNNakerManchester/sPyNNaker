@@ -901,7 +901,9 @@ static void process_fast_source(index_t s_id, spike_source_t *source) {
             if (ssp_params.has_key) {
                 // Send spikes
                 const uint32_t spike_key = keys[s_id] | colour;
-                send_spike_mc_payload(spike_key, num_spikes);
+                for (uint32_t n_spike = 0; n_spike < num_spikes; n_spike++) {
+                	send_spike_mc(spike_key);
+                }
             } else if (sdram_inputs->address != 0) {
             	add_sdram_spikes(s_id, num_spikes);
             }
@@ -937,7 +939,9 @@ static void process_slow_source(index_t s_id, spike_source_t *source) {
             if (ssp_params.has_key) {
                 // Send package
                 const uint32_t spike_key = keys[s_id] | colour;
-                send_spike_mc_payload(spike_key, count);
+                for (uint32_t n_spike = 0; n_spike < count; n_spike++) {
+                	send_spike_mc(spike_key);
+                }
             } else if (sdram_inputs->address != 0) {
                 add_sdram_spikes(s_id, count);
             }

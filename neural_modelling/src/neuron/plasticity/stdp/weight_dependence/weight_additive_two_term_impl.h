@@ -108,7 +108,7 @@ static inline weight_state_t weight_two_term_apply_potentiation(
  * \param[in] state: The updated weight state
  * \return The new weight.
  */
-static inline weight_t weight_get_final(weight_state_t state) {
+static inline weight_t weight_get_final(weight_state_t state, REAL reg_error) {
     return (weight_t) (bitsk(state.weight) >> state.weight_shift);
 }
 

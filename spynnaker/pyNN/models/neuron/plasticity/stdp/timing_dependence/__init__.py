@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from .abstract_timing_dependence import AbstractTimingDependence
+from .timing_dependence_eprop import TimingDependenceEprop
 from .timing_dependence_pfister_spike_triplet import (
     TimingDependencePfisterSpikeTriplet,
 )
@@ -25,9 +26,10 @@ from .timing_dependence_vogels_2011 import TimingDependenceVogels2011
 
 __all__ = [
     "AbstractTimingDependence",
+    "TimingDependenceEprop",
     "TimingDependencePfisterSpikeTriplet",
     "TimingDependenceRecurrent",
     "TimingDependenceSpikeNearestPair",
     "TimingDependenceSpikePair",
-    "TimingDependenceVogels2011"
+    "TimingDependenceVogels2011",
 ]

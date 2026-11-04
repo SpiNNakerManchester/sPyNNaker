@@ -67,9 +67,9 @@ static inline update_state_t synapse_structure_get_update_state(
 //! \param[in] state: the update state
 //! \return the final state
 static inline final_state_t synapse_structure_get_final_state(
-        update_state_t state) {
+        update_state_t state, REAL reg_error) {
     // Get weight from state
-    weight_t weight = weight_get_final(state.weight_state);
+    weight_t weight = weight_get_final(state.weight_state, reg_error);
 
     // Build this into synaptic word along with updated accumulator and state
     return (final_state_t) {

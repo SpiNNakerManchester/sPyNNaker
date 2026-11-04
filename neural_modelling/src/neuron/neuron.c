@@ -209,7 +209,7 @@ void neuron_transfer(weight_t *syns) { // EXPORTED
         uint32_t neuron_index = 0;
         for (uint32_t n_i = n_neurons_peak; n_i > 0; n_i--) {
             weight_t value = syns[ring_buffer_index];
-            if (value > 0) {
+            if (value != 0) {
                 if (neuron_index > n_neurons) {
                     log_error("Neuron index %u out of range", neuron_index);
                     rt_error(RTE_SWERR);
