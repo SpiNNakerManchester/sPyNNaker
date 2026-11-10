@@ -1,4 +1,4 @@
-# Copyright (c) 2017 The University of Manchester
+# Copyright (c) 2026 The University of Manchester
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,9 +34,6 @@ class TestAnyChecker(unittest.TestCase):
         exceptions: list[str] = [
             # kwargs
             "spynnaker_plotting.py",
-            # https://github.com/SpiNNakerManchester/sPyNNaker/issues/1764
-            "abstract_synapse_dynamics.py",
-            "synapse_dynamics_stdp.py",
         ]
         code_dir = os.path.join(repo_dir, "spynnaker")
         checker = AnyChecker(code_dir, exceptions)
