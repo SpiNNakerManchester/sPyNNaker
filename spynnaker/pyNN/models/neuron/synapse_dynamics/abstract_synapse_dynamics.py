@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, cast
 
 import numpy
 from pyNN.random import RandomDistribution
@@ -240,7 +240,7 @@ class AbstractSynapseDynamics(metaclass=AbstractBase):
         """
         return {"source", "target", "weight", "delay"}
 
-    def get_value(self, key: str) -> Any:
+    def get_value(self, key: str) -> float:
         """
         Get a property.
 
@@ -252,7 +252,7 @@ class AbstractSynapseDynamics(metaclass=AbstractBase):
         raise InvalidParameterType(
             f"Type {type(self)} does not have parameter {key}")
 
-    def set_value(self, key: str, value: Any) -> None:
+    def set_value(self, key: str, value: float) -> None:
         """
         Set a property.
 
