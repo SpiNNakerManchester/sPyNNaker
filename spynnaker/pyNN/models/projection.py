@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import functools
 import logging
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from typing import (
     TYPE_CHECKING,
     Literal,
@@ -368,7 +368,7 @@ class Projection:
             format == "list", data_items, fixed_values, notify=notify)
 
     @staticmethod
-    def __save_callback(save_file: str,  metadata: dict[str, object],
+    def __save_callback(save_file: str,  metadata: Mapping[str, object],
                         holder: ConnectionHolder) -> None:
         data = holder.get_data_items()
         if isinstance(data, numpy.ndarray):
