@@ -39,5 +39,6 @@ typedef enum neuron_regions_e {
     NEURON_BUILDER_REGION,      //!< neuron building; 13
     BIT_FIELD_FILTER_REGION,    //!< bitfield filter; 14
     RECORDING_REGION,           //!< general recording data; 15
-	INITIAL_VALUES_REGION       //!< initial neuron state; 16
+	INITIAL_VALUES_REGION,      //!< initial neuron state; 16
+    STDP_UPDATES_REGION         //!< per-core no-spike STDP state; 17
 } regions_e;

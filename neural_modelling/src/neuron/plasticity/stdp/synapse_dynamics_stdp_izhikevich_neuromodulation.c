@@ -76,8 +76,6 @@ static int16_lut *tau_d_lookup;
 
 static uint32_t *nm_weight_shift;
 
-extern uint32_t skipped_synapses;
-
 #define DECAY_LOOKUP_TAU_C(time) \
     maths_lut_exponential_decay(time, tau_c_lookup)
 #define DECAY_LOOKUP_TAU_D(time) \
@@ -121,12 +119,12 @@ static inline neuromodulated_synapse_t get_nm_final_synaptic_word(
 
 static inline post_event_window_t get_post_event_window(
         const post_event_history_t * post_event_history,
-        const uint32_t delayed_pre_time, const uint32_t delayed_last_pre_time,
+        const uint32_t delayed_pre_time, const uint32_t delayed_last_update,
         const uint32_t delay_dendritic) {
     // Get the post-synaptic window of events to be processed
     const uint32_t window_begin_time =
-            (delayed_last_pre_time >= delay_dendritic)
-            ? (delayed_last_pre_time - delay_dendritic) : 0;
+            (delayed_last_update >= delay_dendritic)
+            ? (delayed_last_update - delay_dendritic) : 0;
     const uint32_t window_end_time =
             (delayed_pre_time >= delay_dendritic)
             ? (delayed_pre_time - delay_dendritic) : 0;
@@ -166,9 +164,11 @@ static inline accum get_weight_update(int16_t decay_eligibility_trace,
 //---------------------------------------
 //! \brief Synapse update loop core
 //! \param[in] time: The current time
-//! \param[in] last_pre_time: The time of the last previous pre-event
-//! \param[in] last_pre_trace: The last previous pre-trace
+//! \param[in] history: The last presynaptic event
+//! \param[in] previous_update_time: The time already processed for this row
 //! \param[in] new_pre_trace: The new pre-trace
+//! \param[in] pre_spike: Whether to apply a new presynaptic event
+//! \param[in] track_updates: Whether the caller keeps a separate update cursor
 //! \param[in] delay_dendritic: The dendritic delay for the synapse
 //! \param[in] delay_axonal: The axonal delay for the synapse
 //! \param[in] current_state: The current state
@@ -176,29 +176,40 @@ static inline accum get_weight_update(int16_t decay_eligibility_trace,
 //! \return The new basic state of the synapse
 static inline nm_final_state_t izhikevich_neuromodulation_plasticity_update_synapse(
         const uint32_t time,
-        const uint32_t last_pre_time, const pre_trace_t last_pre_trace,
-        const pre_trace_t new_pre_trace, const uint32_t delay_dendritic,
+        const pre_event_history_t *history, const uint32_t previous_update_time,
+        const pre_trace_t new_pre_trace, const bool pre_spike,
+        const bool track_updates, const uint32_t delay_dendritic,
         const uint32_t delay_axonal, nm_update_state_t current_state,
         const post_event_history_t *post_event_history) {
     log_debug("\tPerforming deferred synapse update at time:%u", time);
     // Apply axonal delay to time of last presynaptic spike
-    const uint32_t delayed_last_pre_time = last_pre_time + delay_axonal;
+    const uint32_t delayed_last_pre_time = history->prev_time + delay_axonal;
+    const uint32_t delayed_last_update = previous_update_time + delay_axonal;
     const uint32_t delayed_pre_time = time + delay_axonal;
 
     // history <- getHistoryEntries(j, t_old, t)
     post_event_window_t post_window = get_post_event_window(
             post_event_history, delayed_pre_time,
-            delayed_last_pre_time, delay_dendritic);
+            delayed_last_update, delay_dendritic);
+#ifdef STDP_NO_SPIKE_UPDATES
+    stdp_update_provenance.history_gaps += post_window.history_gap;
+#endif
 
     // t_c = t_old
-    uint32_t prev_corr_time = delayed_last_pre_time;
+    uint32_t prev_corr_time = delayed_last_update;
 
     // D_c = D_prev.exp(-t_c - t_prev / tau_D)
     int16_t last_dopamine_trace = 0;
     if (post_window.prev_time_valid) {
-        last_dopamine_trace = STDP_FIXED_MUL_16X16(
-            post_window.prev_trace.dopamine_trace,
-            DECAY_LOOKUP_TAU_D(delayed_last_pre_time - post_window.prev_time));
+        // With a cursor the previous event is the start of an already
+        // integrated interval, so use its effective (delayed) time.
+        const uint32_t previous_post = post_window.prev_time
+                + (track_updates ? delay_dendritic : 0);
+        if (previous_post <= delayed_last_update) {
+            last_dopamine_trace = STDP_FIXED_MUL_16X16(
+                post_window.prev_trace.dopamine_trace,
+                DECAY_LOOKUP_TAU_D(delayed_last_update - previous_post));
+        }
     }
 
     // Process events in post-synaptic window
@@ -229,7 +240,7 @@ static inline nm_final_state_t izhikevich_neuromodulation_plasticity_update_syna
         if (!post_events_next_is_dopamine(post_window)) {
             current_state.eligibility_state = timing_apply_post_spike(
                 delayed_post_time, post_window.next_trace->post_trace,
-                delayed_last_pre_time, last_pre_trace, post_window.prev_time,
+                delayed_last_pre_time, history->prev_trace, post_window.prev_time,
                 post_window.prev_trace.post_trace, current_state.eligibility_state);
         }
 
@@ -243,11 +254,8 @@ static inline nm_final_state_t izhikevich_neuromodulation_plasticity_update_syna
         post_window = post_events_next(post_window);
     }
 
-    // Apply spike to state only if there has been a post spike ever
+    // Advance the correlation state to the update time, even without a spike.
     if (post_window.prev_time_valid) {
-        const uint32_t delayed_last_post = post_window.prev_time + delay_dendritic;
-        log_debug("\t\tApplying pre-synaptic event at time:%u last post time:%u, prev_corr=%u",
-                delayed_pre_time, delayed_last_post, prev_corr_time);
         int32_t decay_eligibility_trace = DECAY_LOOKUP_TAU_C(
                 delayed_pre_time - prev_corr_time);
 
@@ -264,10 +272,13 @@ static inline nm_final_state_t izhikevich_neuromodulation_plasticity_update_syna
         synapse_structure_decay_weight(&(current_state.eligibility_state),
                 decay_eligibility_trace);
 
-        current_state.eligibility_state = timing_apply_pre_spike(
-            delayed_pre_time, new_pre_trace, delayed_last_pre_time, last_pre_trace,
-            delayed_last_post, post_window.prev_trace.post_trace,
-            current_state.eligibility_state);
+        if (pre_spike) {
+            const uint32_t delayed_last_post = post_window.prev_time + delay_dendritic;
+            current_state.eligibility_state = timing_apply_pre_spike(
+                delayed_pre_time, new_pre_trace, delayed_last_pre_time, history->prev_trace,
+                delayed_last_post, post_window.prev_trace.post_trace,
+                current_state.eligibility_state);
+        }
     }
 
     return get_nm_final_state(current_state);
@@ -286,6 +297,9 @@ bool synapse_dynamics_initialise(
     if (post_event_history == NULL) {
         return false;
     }
+#ifdef STDP_NO_SPIKE_UPDATES
+    n_post_event_histories = n_neurons;
+#endif
 
     // Load parameters
     nm_params_t *sdram_params = (nm_params_t *) address;
@@ -372,6 +386,10 @@ void synapse_dynamics_process_post_synaptic_event(
         uint32_t time, index_t neuron_index) {
     log_debug("Adding post-synaptic event to trace %u at time:%u", neuron_index, time);
 
+#ifdef STDP_NO_SPIKE_UPDATES
+    // A combined core's DMA callback may read or append to this history.
+    uint32_t cpsr = spin1_irq_disable();
+#endif
     // Add post-event
     post_event_history_t *history = &post_event_history[neuron_index];
     const uint32_t last_post_time = history->times[history->count_minus_one];
@@ -384,12 +402,17 @@ void synapse_dynamics_process_post_synaptic_event(
             DECAY_LOOKUP_TAU_D(time - last_post_time));
 
     post_events_add(time, history, new_post_trace, new_dopamine_trace, false);
+#ifdef STDP_NO_SPIKE_UPDATES
+    note_post_history_pressure(neuron_index, history);
+    spin1_mode_restore(cpsr);
+#endif
 }
 
 //---------------------------------------
 static inline neuromodulated_synapse_t process_plastic_synapse(
-        uint32_t control_word, uint32_t last_pre_time, pre_trace_t last_pre_trace,
-		pre_trace_t new_pre_trace, weight_t *ring_buffers, uint32_t time,
+        uint32_t control_word, const pre_event_history_t *history,
+        uint32_t previous_update_time, pre_trace_t new_pre_trace, bool pre_spike,
+        bool track_updates, weight_t *ring_buffers, uint32_t time,
 		uint32_t colour_delay, neuromodulated_synapse_t synapse) {
     fixed_stdp_synapse s = synapse_dynamics_stdp_get_fixed(control_word, time,
             colour_delay);
@@ -404,16 +427,14 @@ static inline neuromodulated_synapse_t process_plastic_synapse(
 	}
 	nm_final_state_t final_state =
 	    izhikevich_neuromodulation_plasticity_update_synapse(
-            time - colour_delay, last_pre_time, last_pre_trace, new_pre_trace,
+            time - colour_delay, history, previous_update_time, new_pre_trace,
+            pre_spike, track_updates,
             post_delay, s.delay_axonal, current_state,
             &post_event_history[s.index]);
 
 	// Add weight to ring-buffer entry, but only if not too late
-    if (s.delay_dendritic + s.delay_axonal > colour_delay) {
-        synapse_dynamics_stdp_update_ring_buffers(ring_buffers, s,
-                final_state.weight);
-    } else {
-        skipped_synapses++;
+    if (pre_spike) {
+        synapse_dynamics_stdp_deliver(ring_buffers, s, colour_delay, final_state.weight);
     }
 
     return get_nm_final_synaptic_word(final_state);
@@ -453,20 +474,24 @@ static inline void process_neuromodulation(
 
         // Add a new history trace into the buffer of post synaptic events
         post_events_add(time, history, new_post_trace, new_dopamine_trace, true);
+#ifdef STDP_NO_SPIKE_UPDATES
+        note_post_history_pressure(neuron_index, history);
+#endif
     }
 }
 
-bool synapse_dynamics_process_plastic_synapses(
+static inline bool process_plastic_row(
         synapse_row_plastic_data_t *plastic_region_address,
         synapse_row_fixed_part_t *fixed_region,
         weight_t *ring_buffers, uint32_t time, uint32_t colour_delay,
-        bool *write_back) {
+        bool pre_spike, uint32_t *last_update_time) {
 
     // If the flag is set, this is neuromodulation
     if (plastic_region_address->neuromodulation.is_neuromodulation) {
-        process_neuromodulation(plastic_region_address, fixed_region, time);
-        *write_back = false;
-        return true;
+        if (pre_spike) {
+            process_neuromodulation(plastic_region_address, fixed_region, time);
+        }
+        return false;
     }
 
     // Extract separate arrays of plastic synapses (from plastic region),
@@ -475,17 +500,20 @@ bool synapse_dynamics_process_plastic_synapses(
     const control_t *control_words = synapse_row_plastic_controls(fixed_region);
     size_t n_plastic_synapses = synapse_row_num_plastic_controls(fixed_region);
 
-    num_plastic_pre_synaptic_events += n_plastic_synapses;
-
-    // Get last pre-synaptic event from event history
-    const uint32_t last_pre_time = plastic_region_address->history.prev_time;
-    const pre_trace_t last_pre_trace = plastic_region_address->history.prev_trace;
-
-    // Update pre-synaptic trace
-    log_debug("Adding pre-synaptic event to trace at time:%u", time);
-    plastic_region_address->history.prev_time = time - colour_delay;
-    plastic_region_address->history.prev_trace =
-            timing_add_pre_spike(time - colour_delay, last_pre_time, last_pre_trace);
+    pre_event_history_t *history = &plastic_region_address->history;
+    const pre_event_history_t previous = *history;
+    const uint32_t update_time = time - colour_delay;
+    const uint32_t previous_update_time = last_update_time == NULL
+            ? previous.prev_time : *last_update_time;
+    if (!pre_spike && (n_plastic_synapses == 0 || update_time <= previous_update_time)) {
+        return false;
+    }
+    if (pre_spike) {
+        num_plastic_pre_synaptic_events += n_plastic_synapses;
+        history->prev_time = update_time;
+        history->prev_trace = timing_add_pre_spike(
+                update_time, previous.prev_time, previous.prev_trace);
+    }
 
     // Loop through plastic synapses
     for (; n_plastic_synapses > 0; n_plastic_synapses--) {
@@ -493,14 +521,74 @@ bool synapse_dynamics_process_plastic_synapses(
         uint32_t control_word = *control_words++;
 
         plastic_words[0] = process_plastic_synapse(
-                control_word, last_pre_time, last_pre_trace,
-                plastic_region_address->history.prev_trace, ring_buffers, time,
+                control_word, &previous, previous_update_time, history->prev_trace,
+                pre_spike, last_update_time != NULL, ring_buffers, time,
                 colour_delay, plastic_words[0]);
         plastic_words++;
     }
-    *write_back = true;
+    if (last_update_time != NULL) {
+        *last_update_time = update_time;
+    }
     return true;
 }
+
+bool synapse_dynamics_process_plastic_synapses(
+        synapse_row_plastic_data_t *plastic_region_address,
+        synapse_row_fixed_part_t *fixed_region, weight_t *ring_buffers,
+        uint32_t time, uint32_t colour_delay, bool *write_back) {
+    *write_back = process_plastic_row(plastic_region_address, fixed_region,
+            ring_buffers, time, colour_delay, true, NULL);
+    return true;
+}
+
+#ifdef STDP_NO_SPIKE_UPDATES
+bool synapse_dynamics_process_plastic_synapses_with_cursor(
+        synapse_row_plastic_data_t *plastic_region_address,
+        synapse_row_fixed_part_t *fixed_region, weight_t *ring_buffers,
+        uint32_t time, uint32_t colour_delay, uint32_t *last_update_time,
+        bool *write_back) {
+    if (colour_delay > time || time - colour_delay < *last_update_time) {
+        // Deliver the input, but do not rewind the correlation state.
+        const control_t *controls = synapse_row_plastic_controls(fixed_region);
+        uint32_t n_synapses = synapse_row_num_plastic_controls(fixed_region);
+        num_plastic_pre_synaptic_events += n_synapses;
+        for (uint32_t i = 0; i < n_synapses; i++) {
+            fixed_stdp_synapse s = synapse_dynamics_stdp_get_fixed(
+                    controls[i], time, colour_delay);
+            synapse_dynamics_stdp_deliver(ring_buffers, s, colour_delay,
+                    plastic_region_address->synapses[i].weight);
+        }
+        stdp_update_provenance.out_of_order_spikes++;
+        *write_back = false;
+        return true;
+    }
+    *write_back = process_plastic_row(plastic_region_address, fixed_region,
+            ring_buffers, time, colour_delay, true, last_update_time);
+    return true;
+}
+
+bool synapse_dynamics_get_update_cursor(synaptic_row_t row, uint32_t *cursor) {
+    if (synapse_row_plastic_size(row) == 0 ||
+            synapse_row_num_plastic_controls(synapse_row_fixed_region(row)) == 0) {
+        return false;
+    }
+    const synapse_row_plastic_data_t *data = synapse_row_plastic_region(row);
+    if (data->neuromodulation.is_neuromodulation) {
+        return false;
+    }
+    *cursor = data->history.prev_time;
+    return true;
+}
+
+bool synapse_dynamics_update_without_spike(
+        synaptic_row_t row, uint32_t time, uint32_t *last_update_time) {
+    if (last_update_time == NULL || synapse_row_plastic_size(row) == 0) {
+        return false;
+    }
+    return process_plastic_row(synapse_row_plastic_region(row),
+            synapse_row_fixed_region(row), NULL, time, 0, false, last_update_time);
+}
+#endif
 
 static inline neuromodulated_synapse_t *get_plastic_synapses(synaptic_row_t row) {
     synapse_row_plastic_data_t *plastic_data = (void *)

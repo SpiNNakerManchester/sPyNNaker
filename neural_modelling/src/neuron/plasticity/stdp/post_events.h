@@ -59,6 +59,10 @@ typedef struct {
     uint32_t num_events;
     //! Whether the previous post-synaptic event is valid (based on time)
     uint32_t prev_time_valid;
+#ifdef STDP_NO_SPIKE_UPDATES
+    //! The requested interval may include an evicted event.
+    bool history_gap;
+#endif
 } post_event_window_t;
 
 //---------------------------------------
@@ -77,6 +81,22 @@ static inline void print_event_history(const post_event_history_t *events) {
 }
 #endif
 
+//! \brief Reset an array of post-synaptic event histories.
+static inline void post_events_reset_buffers(
+        post_event_history_t *post_event_history, uint32_t n_neurons) {
+    for (uint32_t n = 0; n < n_neurons; n++) {
+#ifdef STDP_NO_SPIKE_UPDATES
+        // This slot keeps the most recently evicted event, as a
+        // predecessor trace and an indication of an incomplete window.
+        post_event_history[n].times[0] = UINT32_MAX;
+#else
+        post_event_history[n].times[0] = 0;
+#endif
+        post_event_history[n].traces[0] = timing_get_initial_post_trace();
+        post_event_history[n].count_minus_one = 0;
+    }
+}
+
 //! \brief Initialise an array of post-synaptic event histories
 //! \param[in] n_neurons: Number of neurons
 //! \return The array
@@ -91,13 +111,7 @@ static inline post_event_history_t *post_events_init_buffers(
         return NULL;
     }
 
-    // Loop through neurons
-    for (uint32_t n = 0; n < n_neurons; n++) {
-        // Add initial placeholder entry to buffer
-        post_event_history[n].times[0] = 0;
-        post_event_history[n].traces[0] = timing_get_initial_post_trace();
-        post_event_history[n].count_minus_one = 0;
-    }
+    post_events_reset_buffers(post_event_history, n_neurons);
 
     return post_event_history;
 }
@@ -111,39 +125,42 @@ static inline post_event_history_t *post_events_init_buffers(
 static inline post_event_window_t post_events_get_window_delayed(
         const post_event_history_t *events, uint32_t begin_time,
         uint32_t end_time) {
-    // Start at end event - beyond end of post-event history
+    // Scan backwards over real events only. The first entry is a sentinel;
+    // count is the index after the last valid event and must not be read.
     const uint32_t count = events->count_minus_one + 1;
-    const uint32_t *end_event_time = events->times + count;
-    const uint32_t *event_time = end_event_time;
-    const post_trace_t *event_trace = events->traces + count;
-
-    post_event_window_t window;
-    do {
-        // If this event is still in the future, set it as the end
-        if (*event_time > end_time) {
-            end_event_time = event_time;
+    uint32_t first = count;
+    uint32_t end = count;
+    while (first > 1 && events->times[first - 1] > begin_time) {
+        first--;
+        if (events->times[first] > end_time) {
+            end = first;
         }
+    }
 
-        // Cache pointer to this event as potential next event and go back one
-        // event.
-        // **NOTE** next_time can be invalid
-        window.next_time = event_time--;
-        window.next_trace = event_trace--;
-
-        // Keep looping while event occurred after start of window and we
-        // haven't hit beginning of array...
-    } while (*event_time > begin_time && event_time != events->times);
-
-    // Deference event to use as previous
-    window.prev_time = *event_time;
-    window.prev_trace = *event_trace;
-    window.prev_time_valid = event_time != events->times;
-
-    // Calculate number of events
-    window.num_events = (end_event_time - window.next_time);
-
-    // Return window
-    return window;
+    const uint32_t previous = first - 1;
+#ifdef STDP_NO_SPIKE_UPDATES
+    const uint32_t evicted = events->times[0];
+    const bool has_evicted = evicted != UINT32_MAX;
+    const bool previous_valid = previous != 0 ||
+            (has_evicted && evicted <= begin_time);
+#endif
+    return (post_event_window_t) {
+#ifdef STDP_NO_SPIKE_UPDATES
+        .prev_trace = previous_valid ? events->traces[previous]
+                : timing_get_initial_post_trace(),
+        .prev_time = previous_valid ? events->times[previous] : 0,
+        .prev_time_valid = previous_valid,
+        .history_gap = has_evicted && begin_time < end_time &&
+                evicted > begin_time,
+#else
+        .prev_trace = events->traces[previous],
+        .prev_time = events->times[previous],
+        .prev_time_valid = previous != 0,
+#endif
+        .next_trace = events->traces + first,
+        .next_time = events->times + first,
+        .num_events = end - first,
+    };
 }
 
 //---------------------------------------
@@ -178,8 +195,11 @@ static inline void post_events_add(
         events->times[new_index] = time;
         events->traces[new_index] = trace;
     } else {
-        // Otherwise Shuffle down elements
-        // **NOTE** 1st element is always an entry at time 0
+        // Preserve the predecessor without growing the history buffers.
+#ifdef STDP_NO_SPIKE_UPDATES
+        events->times[0] = events->times[1];
+        events->traces[0] = events->traces[1];
+#endif
         for (uint32_t e = 2; e < MAX_POST_SYNAPTIC_EVENTS; e++) {
             events->times[e - 1] = events->times[e];
             events->traces[e - 1] = events->traces[e];

@@ -47,6 +47,9 @@ typedef enum callback_priorities {
 struct provenance_data {
     struct synapse_provenance synapse_prov;
     struct spike_processing_fast_provenance spike_processing_prov;
+#ifdef STDP_NO_SPIKE_UPDATES
+    stdp_update_provenance_t stdp_updates;
+#endif
 };
 
 //! Overall regions used by the synapse core
@@ -62,7 +65,9 @@ enum regions {
     STRUCTURAL_DYNAMICS_REGION,
     BIT_FIELD_FILTER_REGION,
     SDRAM_PARAMS_REGION,
-    KEY_REGION
+    KEY_REGION,
+    CONNECTOR_BUILDER_REGION,
+    STDP_UPDATES_REGION
 };
 
 //! From the regions, select those that are common
@@ -87,7 +92,10 @@ const struct synapse_regions SYNAPSE_REGIONS = {
     .pop_table = POPULATION_TABLE_REGION,
     .synapse_dynamics = SYNAPSE_DYNAMICS_REGION,
     .structural_dynamics = STRUCTURAL_DYNAMICS_REGION,
-    .bitfield_filter = BIT_FIELD_FILTER_REGION
+    .bitfield_filter = BIT_FIELD_FILTER_REGION,
+#ifdef STDP_NO_SPIKE_UPDATES
+    .stdp_updates = STDP_UPDATES_REGION,
+#endif
 };
 
 //! The current timer tick value.
@@ -111,6 +119,9 @@ static uint32_t recording_flags = 0;
 static void store_provenance_data(address_t provenance_region) {
     struct provenance_data *prov = (void *) provenance_region;
     store_synapse_provenance(&prov->synapse_prov);
+#ifdef STDP_NO_SPIKE_UPDATES
+    prov->stdp_updates = stdp_update_provenance;
+#endif
     spike_processing_fast_store_provenance(&prov->spike_processing_prov);
 }
 

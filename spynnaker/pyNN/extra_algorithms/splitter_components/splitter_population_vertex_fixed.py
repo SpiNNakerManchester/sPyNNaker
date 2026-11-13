@@ -229,7 +229,8 @@ class SplitterPopulationVertexFixed(SplitterPopulationVertex):
             n_provenance += LocalOnlyProvenance.N_ITEMS
         else:
             n_provenance += (
-                SynapseProvenance.N_ITEMS + SpikeProcessingProvenance.N_ITEMS)
+                SynapseProvenance.N_ITEMS + SpikeProcessingProvenance.N_ITEMS +
+                self.governed_app_vertex.n_stdp_update_provenance_words)
 
         sdram = MultiRegionSDRAM()
         if isinstance(s_dynamics, AbstractLocalOnly):
@@ -276,6 +277,8 @@ class SplitterPopulationVertexFixed(SplitterPopulationVertex):
         sdram = MultiRegionSDRAM()
         sdram.add_cost(regions.synapse_params,
                        self.governed_app_vertex.get_synapse_params_size())
+        sdram.add_cost(PopulationMachineVertex.REGIONS.STDP_UPDATES,
+                       self.governed_app_vertex.get_stdp_update_size())
         sdram.add_cost(regions.synapse_dynamics,
                        self.governed_app_vertex.get_synapse_dynamics_size(
                            n_atoms))

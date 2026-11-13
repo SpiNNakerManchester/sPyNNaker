@@ -34,8 +34,15 @@ ifneq ($(SPYNNAKER_DEBUG), DEBUG)
               synapses_stdp_izhikevich_neuromodulation_pair_additive_structural_last_neuron_distance_weight
 endif
 
+# Build the optional scheduler without changing the regular binaries.
+UPDATE_MODELS = $(foreach model,$(MODELS),\
+    $(if $(findstring _stdp_,$(model)),\
+        $(if $(findstring _structural_,$(model)),,$(model))))
+
 all:
 	for d in $(MODELS); do $(MAKE) -C $$d || exit $$?; done
+	for d in $(UPDATE_MODELS); do $(MAKE) -C $$d STDP_UPDATE_BUILD=1 || exit $$?; done
 
 clean:
 	for d in $(MODELS); do $(MAKE) -C $$d clean || exit $$?; done
+	for d in $(UPDATE_MODELS); do $(MAKE) -C $$d STDP_UPDATE_BUILD=1 clean || exit $$?; done

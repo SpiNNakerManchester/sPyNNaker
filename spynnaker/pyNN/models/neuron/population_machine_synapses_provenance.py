@@ -17,6 +17,33 @@ from typing import ClassVar
 
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 
+N_STDP_UPDATE_PROVENANCE_WORDS = 4
+STDP_PRESSURE_UPDATES = "STDP post-history pressure updates"
+
+
+def parse_stdp_update_provenance(
+        label: str, x: int, y: int, p: int, data: Sequence[int]) -> None:
+    """Record completed updates and incomplete post-event windows."""
+    completed, history_gaps, out_of_order_spikes, pressure_updates = data
+    with ProvenanceWriter() as db:
+        db.insert_core(x, y, p, "STDP updates without a spike", completed)
+        db.insert_core(x, y, p, STDP_PRESSURE_UPDATES, pressure_updates)
+        db.insert_core(x, y, p, "STDP incomplete post-event windows",
+                       history_gaps)
+        db.insert_core(x, y, p, "STDP out-of-order input spikes",
+                       out_of_order_spikes)
+        if history_gaps:
+            db.insert_report(
+                f"STDP on {label} processed {history_gaps} possibly "
+                "incomplete post-event windows. Reduce the number of active "
+                "rows per core or increase the update budget and time scale "
+                "factor.")
+        if out_of_order_spikes:
+            db.insert_report(
+                f"STDP on {label} received {out_of_order_spikes} spikes "
+                "older than the processed simulation time. Their plasticity "
+                "was skipped.")
+
 
 class SynapseProvenance(ctypes.LittleEndianStructure):
     """

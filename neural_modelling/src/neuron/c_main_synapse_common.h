@@ -38,6 +38,10 @@ struct synapse_regions {
     uint32_t structural_dynamics;
     //! The filters to avoid DMA transfers of empty rows
     uint32_t bitfield_filter;
+#ifdef STDP_NO_SPIKE_UPDATES
+    //! Per-core state for optional no-spike STDP updates
+    uint32_t stdp_updates;
+#endif
 };
 
 //! The provenance information for synaptic processing
@@ -125,11 +129,23 @@ static inline bool initialise_synapse_regions(
         return false;
     }
     // Set up the synapse dynamics
-    if (!synapse_dynamics_initialise(
-            data_specification_get_region(regions.synapse_dynamics, ds_regions),
+    address_t dynamics = data_specification_get_region(
+            regions.synapse_dynamics, ds_regions);
+    if (!synapse_dynamics_initialise(dynamics,
             n_neurons, n_synapse_types, ring_buffer_to_input_buffer_left_shifts)) {
         return false;
     }
+#ifdef STDP_NO_SPIKE_UPDATES
+    stdp_update_region_t *updates = data_specification_get_region(
+            regions.stdp_updates, ds_regions);
+    uint32_t post_delay_mask = synapse_dynamics_has_post_delay()
+            ? synapse_delay_mask : 0;
+    if (updates == NULL || !stdp_updates_initialise(updates, n_neurons,
+            synapse_index_mask, post_delay_mask, synapse_type_index_bits)) {
+        log_error("Invalid no-spike STDP update configuration");
+        return false;
+    }
+#endif
 
     // Set up structural plasticity dynamics
     if (!synaptogenesis_dynamics_initialise(data_specification_get_region(

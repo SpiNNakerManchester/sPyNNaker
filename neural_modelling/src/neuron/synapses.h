@@ -107,6 +107,17 @@ bool synapses_process_synaptic_row(
         uint32_t time, uint32_t spike_colour, uint32_t colour_mask,
 		synaptic_row_t row, bool *write_back);
 
+#ifdef STDP_NO_SPIKE_UPDATES
+#include "plasticity/stdp/stdp_update_schedule.h"
+
+//! Process a real spike for a scheduler-enabled core, returning an update
+//! cursor to commit only once the corresponding row has been written back.
+bool synapses_process_synaptic_row_with_update(
+        uint32_t time, uint32_t spike_colour, uint32_t colour_mask,
+        synaptic_row_t row, synaptic_row_t sdram_row, uint32_t n_bytes,
+        bool *write_back, stdp_update_commit_t *update);
+#endif
+
 //! \brief returns the counters for plastic and fixed pre synaptic events based
 //!        on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or
 //!        returns 0

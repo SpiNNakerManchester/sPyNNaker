@@ -111,6 +111,8 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics. \
     )
 from spynnaker.pyNN.models.neuron.synapse_dynamics. \
     synapse_dynamics_static import SynapseDynamicsStatic
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    synapse_dynamics_stdp import SynapseDynamicsSTDP
 from spynnaker.pyNN.models.neuron.synapse_dynamics.types import (
     NUMPY_CONNECTORS_DTYPE,
 )
@@ -132,6 +134,9 @@ from spynnaker.pyNN.utilities.utility_calls import (
 from .generator_data import GeneratorData
 from .master_pop_table import MasterPopTableAsBinarySearch
 from .population_machine_neurons import PopulationMachineNeurons
+from .population_machine_synapses_provenance import (
+    N_STDP_UPDATE_PROVENANCE_WORDS,
+)
 from .synapse_io import get_max_row_info
 from .synaptic_matrices import SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
 
@@ -1498,6 +1503,22 @@ class PopulationVertex(
 
         return self.__synapse_dynamics.get_parameters_sdram_usage_in_bytes(
             n_atoms, self.__neuron_impl.get_n_synapse_types())
+
+    def get_stdp_update_size(self) -> int:
+        """
+        :returns: SDRAM bytes for a private STDP update registry on each core.
+        """
+        if isinstance(self.__synapse_dynamics, SynapseDynamicsSTDP):
+            return self.__synapse_dynamics.get_stdp_update_size(
+                min(self.get_max_atoms_per_core(), self.n_atoms))
+        return 0
+
+    @property
+    def n_stdp_update_provenance_words(self) -> int:
+        """Words appended by the scheduler-enabled firmware, if selected."""
+        return (
+            N_STDP_UPDATE_PROVENANCE_WORDS
+            if self.get_stdp_update_size() else 0)
 
     def get_structural_dynamics_size(self, n_atoms: int) -> int:
         """

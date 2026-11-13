@@ -26,6 +26,16 @@
 #include <common/in_spikes.h>
 #include <recording.h>
 
+#ifdef STDP_NO_SPIKE_UPDATES
+#include "dma_common.h"
+#include "plasticity/synapse_dynamics.h"
+
+static stdp_update_commit_t scheduled_stdp_update;
+static stdp_update_commit_t pending_stdp_write;
+static bool stdp_write_pending;
+static bool stdp_paused;
+#endif
+
 //! DMA buffer structure combines the row read from SDRAM with information
 //! about the read.
 typedef struct dma_buffer {
@@ -181,6 +191,9 @@ static inline bool is_something_to_do(
         biggest_fill_size_of_input_buffer = input_buffer_filled_size;
     }
 
+#ifdef STDP_NO_SPIKE_UPDATES
+check_input_buffer:
+#endif
     // Are there any more spikes to process?
     while (in_spikes_get_next_spike(spike)) {
         // Enable interrupts while looking up in the master pop table,
@@ -195,6 +208,26 @@ static inline bool is_something_to_do(
         // Disable interrupts before checking if there is another spike
         cpsr = spin1_int_disable();
     }
+
+#ifdef STDP_NO_SPIKE_UPDATES
+    // Allow packet reception while scanning the SDRAM registry. The DMA
+    // loop is still busy, so the packet callback only queues new input.
+    spin1_mode_restore(cpsr);
+    scheduled_stdp_update = stdp_updates_next(time);
+    if (scheduled_stdp_update.row != NULL) {
+        const stdp_update_row_t *row = scheduled_stdp_update.row;
+        *spike = 0;
+        *result = (pop_table_lookup_result_t) {
+            .row_address = (synaptic_row_t) row->address,
+            .n_bytes_to_transfer = row->n_bytes
+        };
+        return true;
+    }
+    cpsr = spin1_int_disable();
+    if (in_spikes_size() != 0) {
+        goto check_input_buffer;
+    }
+#endif
 
     // If nothing to do, the DMA is not busy
     dma_busy = false;
@@ -224,6 +257,9 @@ static bool setup_synaptic_dma_read(dma_buffer *current_buffer,
     pop_table_lookup_result_t result;
     dma_n_spikes = 0;
     dma_n_rewires = 0;
+#ifdef STDP_NO_SPIKE_UPDATES
+    scheduled_stdp_update = (stdp_update_commit_t) {0};
+#endif
 
     // Keep looking if there is something to do until a DMA can be done
     bool setup_done = false;
@@ -248,7 +284,12 @@ static bool setup_synaptic_dma_read(dma_buffer *current_buffer,
 
         // needs to be here to ensure that its only recording actual spike
         // processing and not the surplus DMA requests.
-        spike_processing_count++;
+#ifdef STDP_NO_SPIKE_UPDATES
+        if (scheduled_stdp_update.row == NULL)
+#endif
+        {
+            spike_processing_count++;
+        }
     }
     return setup_done;
 }
@@ -283,6 +324,11 @@ static inline void setup_synaptic_dma_write(
 
 //! \brief Start the DMA processing loop if not already running
 static inline void start_dma_loop(void) {
+#ifdef STDP_NO_SPIKE_UPDATES
+    if (stdp_paused) {
+        return;
+    }
+#endif
     // If we're not already processing synaptic DMAs,
     // flag pipeline as busy and trigger a feed event
     // NOTE: locking is not used here because this is assumed to be FIQ
@@ -321,6 +367,56 @@ static void multicast_packet_pl_received_callback(uint key, uint payload) {
     }
 }
 
+static void report_row_error(dma_buffer *buffer) {
+    log_error("Error processing spike 0x%.8x for address 0x%.8x (local=0x%.8x)",
+            buffer->originating_spike, buffer->sdram_writeback_address,
+            buffer->row);
+    address_t row = (address_t) buffer->row;
+    for (uint32_t i = 0; i < (buffer->n_bytes_transferred >> 2); i++) {
+        log_error("%u: 0x%08x", i, row[i]);
+    }
+    rt_error(RTE_SWERR);
+}
+
+#ifdef STDP_NO_SPIKE_UPDATES
+static void stdp_write_complete(UNUSED uint unused, UNUSED uint tag) {
+    stdp_updates_commit(pending_stdp_write);
+    stdp_write_pending = false;
+    if (!stdp_paused) {
+        setup_synaptic_dma_read(NULL, NULL, NULL);
+    }
+}
+
+//! Process one read without prefetch. A read of this row after this point
+//! must see both the new weights and the cursor of the same transaction.
+static void process_stdp_dma_row(uint32_t buffer_index) {
+    dma_buffer *buffer = &dma_buffers[buffer_index];
+    stdp_update_commit_t update = scheduled_stdp_update;
+    bool write_back = false;
+    if (update.row != NULL) {
+        uint32_t cursor = update.row->cursor;
+        write_back = synapse_dynamics_update_without_spike(
+                buffer->row, update.time, &cursor);
+        update.time = cursor;
+    } else if (dma_n_spikes != 0) {
+        if (!synapses_process_synaptic_row_with_update(
+                time, buffer->colour, buffer->colour_mask, buffer->row,
+                buffer->sdram_writeback_address, buffer->n_bytes_transferred,
+                &write_back, &update)) {
+            report_row_error(buffer);
+        }
+    }
+
+    if (write_back) {
+        pending_stdp_write = update;
+        stdp_write_pending = true;
+        setup_synaptic_dma_write(buffer_index, true);
+    } else if (!stdp_paused) {
+        setup_synaptic_dma_read(NULL, NULL, NULL);
+    }
+}
+#endif
+
 //! \brief Called when a DMA completes
 //! \param unused: unused
 //! \param[in] tag: What sort of DMA has finished?
@@ -331,6 +427,10 @@ static void dma_complete_callback(UNUSED uint unused, UNUSED uint tag) {
 
     // Get pointer to current buffer
     uint32_t current_buffer_index = buffer_being_read;
+#ifdef STDP_NO_SPIKE_UPDATES
+    buffer_being_read = N_DMA_BUFFERS;
+    process_stdp_dma_row(current_buffer_index);
+#else
     dma_buffer *current_buffer = &dma_buffers[current_buffer_index];
 
     // Start the next DMA transfer and get a count of the rewires and spikes
@@ -365,20 +465,7 @@ static void dma_complete_callback(UNUSED uint unused, UNUSED uint tag) {
         if (!synapses_process_synaptic_row(
                 time, current_buffer->colour, current_buffer->colour_mask,
 				current_buffer->row, &write_back_now)) {
-            log_error(
-                    "Error processing spike 0x%.8x for address 0x%.8x"
-                    " (local=0x%.8x)",
-                    current_buffer->originating_spike,
-                    current_buffer->sdram_writeback_address,
-                    current_buffer->row);
-
-            // Print out the row for debugging
-            address_t row = (address_t) current_buffer->row;
-            for (uint32_t i = 0;
-                    i < (current_buffer->n_bytes_transferred >> 2); i++) {
-                log_error("%u: 0x%08x", i, row[i]);
-            }
-            rt_error(RTE_SWERR);
+            report_row_error(current_buffer);
         }
 
         write_back |= write_back_now;
@@ -388,12 +475,18 @@ static void dma_complete_callback(UNUSED uint unused, UNUSED uint tag) {
     if (write_back) {
         setup_synaptic_dma_write(current_buffer_index, plastic_only);
     }
+#endif
 }
 
 //! \brief Called when a user event is received
 //! \param unused0: unused
 //! \param unused1: unused
 void user_event_callback(UNUSED uint unused0, UNUSED uint unused1) {
+#ifdef STDP_NO_SPIKE_UPDATES
+    if (!stdp_paused) {
+        setup_synaptic_dma_read(NULL, NULL, NULL);
+    }
+#else
     // Reset the counters as this is a new process
     dma_n_rewires = 0;
     dma_n_spikes = 0;
@@ -407,15 +500,18 @@ void user_event_callback(UNUSED uint unused0, UNUSED uint unused1) {
         // If the DMA buffer is invalid, just do the first transfer possible
         setup_synaptic_dma_read(NULL, NULL, NULL);
     }
+#endif
 }
 
 /* INTERFACE FUNCTIONS - cannot be static */
 void spike_processing_clear_input_buffer(timer_t time) {
     uint32_t n_spikes = in_spikes_size();
     if (clear_input_buffers_of_late_packets) {
+#ifndef STDP_NO_SPIKE_UPDATES
         spin1_dma_flush();
-        in_spikes_clear();
         dma_busy = false;
+#endif
+        in_spikes_clear();
     }
 
     // Record the number of packets received last timer tick
@@ -459,6 +555,10 @@ bool spike_processing_initialise( // EXPORTED
             multicast_packet_pl_received_callback, mc_packet_callback_priority);
     simulation_dma_transfer_done_callback_on(
             DMA_TAG_READ_SYNAPTIC_ROW, dma_complete_callback);
+#ifdef STDP_NO_SPIKE_UPDATES
+    simulation_dma_transfer_done_callback_on(
+            DMA_TAG_WRITE_PLASTIC_REGION, stdp_write_complete);
+#endif
     spin1_callback_on(USER_EVENT, user_event_callback, user_event_priority);
 
     return true;
@@ -482,3 +582,37 @@ bool spike_processing_do_rewiring(int number_of_rewires) {
     spin1_mode_restore(cpsr);
     return true;
 }
+
+#ifdef STDP_NO_SPIKE_UPDATES
+void spike_processing_do_stdp_updates(timer_t local_time) {
+    uint32_t cpsr = spin1_int_disable();
+    if (local_time == time) {
+        stdp_paused = false;
+        stdp_updates_begin_timestep(local_time);
+        start_dma_loop();
+    }
+    spin1_mode_restore(cpsr);
+}
+
+void spike_processing_pause_stdp_updates(void) {
+    uint32_t cpsr = spin1_int_disable();
+    stdp_paused = true;
+    if (buffer_being_read < N_DMA_BUFFERS &&
+            scheduled_stdp_update.row == NULL) {
+        // Finish an in-flight real spike before the host can read weights.
+        // A pending background read is safe to cancel: it changed no state.
+        wait_for_dma_to_complete();
+        spin1_dma_flush();
+        process_stdp_dma_row(buffer_being_read);
+    }
+    if (stdp_write_pending) {
+        wait_for_dma_to_complete();
+        stdp_updates_commit(pending_stdp_write);
+        stdp_write_pending = false;
+    }
+    spin1_dma_flush();
+    buffer_being_read = N_DMA_BUFFERS;
+    dma_busy = false;
+    spin1_mode_restore(cpsr);
+}
+#endif

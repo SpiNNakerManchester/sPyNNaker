@@ -34,6 +34,7 @@
 // Plasticity includes
 #include "maths.h"
 #include "post_events.h"
+#include "stdp_update_schedule.h"
 
 #include "weight_dependence/weight.h"
 #include "timing_dependence/timing.h"
@@ -104,6 +105,28 @@ static stdp_params params;
 
 //! \brief The history data of post-events
 static post_event_history_t *post_event_history;
+
+#ifdef STDP_NO_SPIKE_UPDATES
+static uint32_t n_post_event_histories;
+
+bool synapse_dynamics_has_post_delay(void) {
+    return params.backprop_delay != 0;
+}
+
+static inline void note_post_history_pressure(
+        uint32_t neuron, const post_event_history_t *history) {
+    // Keep three slots of headroom in the 15-event history.
+    if (history->count_minus_one >= MAX_POST_SYNAPTIC_EVENTS - 4) {
+        // The earliest few entries can be evicted before the next turn,
+        // even if this row has already processed the very first entry.
+        stdp_updates_note_pressure(neuron, history->times[1], history->times[3]);
+    }
+}
+
+void synapse_dynamics_reset_post_events(void) {
+    post_events_reset_buffers(post_event_history, n_post_event_histories);
+}
+#endif
 
 //! Count of pre-synaptic events relevant to plastic processing
 static uint32_t num_plastic_pre_synaptic_events = 0;
@@ -194,6 +217,19 @@ static inline void synapse_dynamics_stdp_update_ring_buffers(
     }
 
     ring_buffers[s.ring_buffer_index] = accumulation;
+}
+
+extern uint32_t skipped_synapses;
+
+//! Deliver a real spike if its synaptic delay still reaches a future tick.
+static inline void synapse_dynamics_stdp_deliver(
+        weight_t *ring_buffers, fixed_stdp_synapse synapse,
+        uint32_t colour_delay, weight_t weight) {
+    if (synapse.delay_axonal + synapse.delay_dendritic > colour_delay) {
+        synapse_dynamics_stdp_update_ring_buffers(ring_buffers, synapse, weight);
+    } else {
+        skipped_synapses++;
+    }
 }
 
 //! packing all of the information into the required plastic control word

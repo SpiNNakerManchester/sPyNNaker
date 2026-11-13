@@ -48,6 +48,9 @@ struct combined_provenance {
     uint32_t max_backgrounds_queued;
     //! Background queue overloads
     uint32_t n_background_queue_overloads;
+#ifdef STDP_NO_SPIKE_UPDATES
+    stdp_update_provenance_t stdp_updates;
+#endif
 };
 
 //! Identify the priorities for all tasks
@@ -86,7 +89,10 @@ const struct synapse_regions SYNAPSE_REGIONS = {
     .pop_table = POPULATION_TABLE_REGION,
     .synapse_dynamics = SYNAPSE_DYNAMICS_REGION,
     .structural_dynamics = STRUCTURAL_DYNAMICS_REGION,
-    .bitfield_filter = BIT_FIELD_FILTER_REGION
+    .bitfield_filter = BIT_FIELD_FILTER_REGION,
+#ifdef STDP_NO_SPIKE_UPDATES
+    .stdp_updates = STDP_UPDATES_REGION,
+#endif
 };
 
 //! The current timer tick value.
@@ -125,6 +131,9 @@ static void c_main_store_provenance_data(address_t provenance_region) {
     prov->max_backgrounds_queued = max_backgrounds_queued;
     store_neuron_provenance(&prov->neuron_provenance);
     store_synapse_provenance(&prov->synapse_provenance);
+#ifdef STDP_NO_SPIKE_UPDATES
+    prov->stdp_updates = stdp_update_provenance;
+#endif
     spike_processing_store_provenance(&prov->spike_processing_provenance);
 }
 
@@ -170,6 +179,10 @@ void background_callback(uint timer_count, uint local_time) {
     // Now do neuron time step update
     neuron_do_timestep_update(local_time, timer_count);
 
+#ifdef STDP_NO_SPIKE_UPDATES
+    spike_processing_do_stdp_updates(local_time);
+#endif
+
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
     n_backgrounds_queued--;
 }
@@ -198,6 +211,9 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
     /* if a fixed number of simulation ticks that were specified at startup
      * then do reporting for finishing */
     if (simulation_is_finished()) {
+#ifdef STDP_NO_SPIKE_UPDATES
+        spike_processing_pause_stdp_updates();
+#endif
 
         // Enter pause and resume state to avoid another tick
         simulation_handle_pause_resume(resume_callback);

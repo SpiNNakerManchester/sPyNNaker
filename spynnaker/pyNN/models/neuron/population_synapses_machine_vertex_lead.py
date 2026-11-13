@@ -137,6 +137,7 @@ class PopulationSynapsesMachineVertexLead(
 
         # Write information about keys
         self._write_key_spec(spec)
+        self._write_stdp_update_spec(spec)
 
         # End the writing of this specification:
         spec.end_specification()
