@@ -37,6 +37,8 @@ from spinn_front_end_common.interface.ds import (
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 
 from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
+    synapse_dynamics_stdp import SynapseDynamicsSTDP
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 
 from .population_machine_common import CommonRegions, PopulationMachineCommon
@@ -46,7 +48,10 @@ from .population_machine_neurons import (
     PopulationMachineNeurons,
 )
 from .population_machine_synapses import PopulationMachineSynapses
-from .population_machine_synapses_provenance import SynapseProvenance
+from .population_machine_synapses_provenance import (
+    SynapseProvenance,
+    parse_stdp_update_provenance,
+)
 from .population_vertex import PopulationVertex
 from .synaptic_matrices import SynapseRegions
 
@@ -141,6 +146,7 @@ class PopulationMachineVertex(
         BIT_FIELD_FILTER = 14
         RECORDING = 15
         INITIAL_VALUES = 16
+        STDP_UPDATES = 17
 
     # Regions for this vertex used by common parts
     COMMON_REGIONS = CommonRegions(
@@ -204,7 +210,8 @@ class PopulationMachineVertex(
             label, app_vertex, vertex_slice, sdram,
             self.COMMON_REGIONS,
             NeuronProvenance.N_ITEMS + SynapseProvenance.N_ITEMS +
-            SpikeProcessingProvenance.N_ITEMS + MainProvenance.N_ITEMS,
+            SpikeProcessingProvenance.N_ITEMS + MainProvenance.N_ITEMS +
+            app_vertex.n_stdp_update_provenance_words,
             self._PROFILE_TAG_LABELS, app_vertex.combined_binary_file_name)
         self.__key: int | None = None
         self.__slice_index = slice_index
@@ -280,7 +287,12 @@ class PopulationMachineVertex(
         self._parse_spike_processing_provenance(
             label, x, y, p, provenance_data[proc_offset:end_proc_offset])
 
-        main_prov = MainProvenance(*provenance_data[-MainProvenance.N_ITEMS:])
+        end_main_offset = end_proc_offset + MainProvenance.N_ITEMS
+        main_prov = MainProvenance(
+            *provenance_data[end_proc_offset:end_main_offset])
+        if self._pop_vertex.n_stdp_update_provenance_words:
+            parse_stdp_update_provenance(
+                label, x, y, p, provenance_data[end_main_offset:])
 
         with ProvenanceWriter() as db:
             db.insert_core(
@@ -325,6 +337,10 @@ class PopulationMachineVertex(
         self._write_synapse_data_spec(
             spec, self.__ring_buffer_shifts,
             self.__weight_scales, self.__structural_sz)
+        dynamics = self._pop_vertex.synapse_dynamics
+        if isinstance(dynamics, SynapseDynamicsSTDP):
+            dynamics.write_stdp_update_region(
+                spec, self.REGIONS.STDP_UPDATES, self._max_atoms_per_core)
 
         # End the writing of this specification:
         spec.end_specification()

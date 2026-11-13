@@ -17,6 +17,9 @@
 MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 SPYNNAKER_DIR := $(abspath $(dir $(MAKEFILE_PATH))/../../../)/
 
+ifeq ($(STDP_UPDATE_BUILD),1)
+    APP := $(APP)_no_spike_updates
+endif
 BUILD_DIR := $(SPYNNAKER_DIR)neural_modelling/builds/$(APP)/
 APP_OUTPUT_DIR := $(SPYNNAKER_DIR)spynnaker/pyNN/model_binaries/
 # key for the database in this APP_OUTPUT_DIR

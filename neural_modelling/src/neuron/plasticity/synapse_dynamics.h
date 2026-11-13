@@ -48,6 +48,47 @@ bool synapse_dynamics_process_plastic_synapses(
         weight_t *ring_buffers, uint32_t time, uint32_t colour_delay,
         bool *write_back);
 
+#ifdef STDP_NO_SPIKE_UPDATES
+//! \brief Process a presynaptic spike for an STDP row with a separate cursor.
+//! \details The caller stores one cursor per row and uses it for both this
+//!     function and synapse_dynamics_update_without_spike(). The cursor starts
+//!     at zero and records the last simulation time already processed.
+//!     Out-of-order spikes can deliver input but do not rewind learning.
+//! \param[in,out] plastic_region_data: The plastic data region of the row
+//! \param[in] fixed_region: The control words and size of the row
+//! \param[in,out] ring_buffers: The input buffers for the neuron core
+//! \param[in] time: Current simulation time
+//! \param[in] colour_delay: Delay in processing the incoming spike
+//! \param[in,out] last_update_time: The update cursor for this row
+//! \param[out] write_back: Whether the plastic data needs writing back
+//! \return True if the row was processed successfully
+bool synapse_dynamics_process_plastic_synapses_with_cursor(
+        synapse_row_plastic_data_t *plastic_region_data,
+        synapse_row_fixed_part_t *fixed_region, weight_t *ring_buffers,
+        uint32_t time, uint32_t colour_delay, uint32_t *last_update_time,
+        bool *write_back);
+
+//! \brief Apply deferred STDP events without emitting a presynaptic spike.
+//! \details The caller must only use active rows and a completed time that
+//!     does not overtake any unprocessed events.
+//! \param[in,out] row: The synaptic row in local memory
+//! \param[in] time: Apply events through this simulation time
+//! \param[in,out] last_update_time: The update cursor for this row
+//! \return True if the plastic part of the row needs writing back
+bool synapse_dynamics_update_without_spike(
+        synaptic_row_t row, uint32_t time, uint32_t *last_update_time);
+
+//! Get the initial cursor from a row that supports no-spike updates.
+//! Static, empty and neuromodulation-input rows have no update cursor.
+bool synapse_dynamics_get_update_cursor(synaptic_row_t row, uint32_t *cursor);
+
+//! Whether post events are delayed before updating a row.
+bool synapse_dynamics_has_post_delay(void);
+
+//! Reset post-event state for an opted-in simulation after a time reset.
+void synapse_dynamics_reset_post_events(void);
+#endif
+
 //! \brief Inform the synapses that the neuron fired
 //! \param[in] time: The current simulation time
 //! \param[in] neuron_index: Which neuron are we processing

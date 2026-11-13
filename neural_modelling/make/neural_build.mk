@@ -133,6 +133,17 @@ ifdef TIMING_DEPENDENCE
     STDP_INCLUDES := $(STDP_INCLUDES) -include $(TIMING_DEPENDENCE_H) 
 endif
 
+ifeq ($(STDP_UPDATE_BUILD),1)
+    ifndef TIMING_DEPENDENCE
+        $(error No-spike updates require STDP)
+    endif
+    ifdef SYNAPTOGENESIS_DYNAMICS
+        $(error No-spike updates do not support structural plasticity)
+    endif
+    CFLAGS += -DSTDP_NO_SPIKE_UPDATES
+    STDP_UPDATE_SOURCES := neuron/plasticity/stdp/stdp_update_schedule.c
+endif
+
 ifndef SYNAPTOGENESIS_DYNAMICS
     SYNAPTOGENESIS_DYNAMICS := neuron/structural_plasticity/synaptogenesis_dynamics_static_impl.c
     SYNAPTOGENESIS_DYNAMICS_C := $(NEURON_MODIFIED_DIR)$(SYNAPTOGENESIS_DYNAMICS)
@@ -185,11 +196,19 @@ SOURCES = neuron/c_main.c \
           neuron/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
           $(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) \
           $(TIMING_DEPENDENCE) $(SYNAPTOGENESIS_DYNAMICS) \
-          $(PARTNER_SELECTION) $(FORMATION) $(ELIMINATION) $(OTHER_SOURCES_CONVERTED)
+          $(PARTNER_SELECTION) $(FORMATION) $(ELIMINATION) \
+          $(STDP_UPDATE_SOURCES) $(OTHER_SOURCES_CONVERTED)
 
 include $(FEC_INSTALL_DIR)/make/fec.mk
 
-FEC_OPT = $(OTIME)
+FEC_OPT = $(if $(filter 1,$(STDP_UPDATE_BUILD)),$(OSPACE),$(OTIME))
+
+ifeq ($(STDP_UPDATE_BUILD),1)
+# Keep scheduler metadata handling in Thumb code so it fits in ITCM.
+$(BUILD_DIR)neuron/plasticity/stdp/stdp_update_schedule.o: $(NEURON_MODIFIED_DIR)neuron/plasticity/stdp/stdp_update_schedule.c
+	-@mkdir -p $(dir $@)
+	$(CC_THUMB) $(CFLAGS) -o $@ $<
+endif
 
 # Synapse build rules
 SYNAPSE_TYPE_COMPILE = $(CC) -DLOG_LEVEL=$(SYNAPSE_DEBUG) $(CFLAGS)
@@ -219,7 +238,7 @@ STDP_COMPILE = $(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) $(STDP_INCLUDES)
 $(SYNAPSE_DYNAMICS_O): $(SYNAPSE_DYNAMICS_C)
 	# SYNAPSE_DYNAMICS_O stdp
 	-@mkdir -p $(dir $@)
-	$(STDP_COMPILE) -o $@ $<
+	$(STDP_COMPILE) $(if $(filter 1,$(GNU)),-ffunction-sections) -o $@ $<
 
 $(SYNAPTOGENESIS_DYNAMICS_O): $(SYNAPTOGENESIS_DYNAMICS_C)
 	# SYNAPTOGENESIS_DYNAMICS_O stdp

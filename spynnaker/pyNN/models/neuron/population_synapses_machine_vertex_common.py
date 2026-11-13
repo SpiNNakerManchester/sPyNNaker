@@ -41,7 +41,11 @@ from spynnaker.pyNN.models.abstract_models. \
     sends_synaptic_inputs_over_sdram import SendsSynapticInputsOverSDRAM
 
 from .population_machine_common import CommonRegions, PopulationMachineCommon
-from .population_machine_synapses_provenance import SynapseProvenance
+from .population_machine_synapses_provenance import (
+    SynapseProvenance,
+    parse_stdp_update_provenance,
+)
+from .synapse_dynamics.synapse_dynamics_stdp import SynapseDynamicsSTDP
 from .synaptic_matrices import SynapseRegions
 
 if TYPE_CHECKING:
@@ -144,6 +148,7 @@ class PopulationSynapsesMachineVertexCommon(
         SDRAM_EDGE_PARAMS = 10
         KEY_REGION = 11
         CONNECTOR_BUILDER = 12
+        STDP_UPDATES = 13
 
     # Regions for this vertex used by common parts
     COMMON_REGIONS = CommonRegions(
@@ -180,7 +185,8 @@ class PopulationSynapsesMachineVertexCommon(
         """
         super().__init__(
             label, app_vertex, vertex_slice, sdram, self.COMMON_REGIONS,
-            SynapseProvenance.N_ITEMS + SpikeProcessingFastProvenance.N_ITEMS,
+            SynapseProvenance.N_ITEMS + SpikeProcessingFastProvenance.N_ITEMS +
+            app_vertex.n_stdp_update_provenance_words,
             self._PROFILE_TAG_LABELS, app_vertex.synapse_core_binary_file_name)
         self.__sdram_partition: (SourceSegmentedSDRAMMachinePartition |
                                  None) = None
@@ -262,6 +268,15 @@ class PopulationSynapsesMachineVertexCommon(
             spec.write_value(self._pop_vertex.n_colour_bits)
             spec.write_value(int(self._pop_vertex.self_projection is not None))
 
+    def _write_stdp_update_spec(
+            self, spec: DataSpecificationGenerator) -> None:
+        dynamics = self._pop_vertex.synapse_dynamics
+        if isinstance(dynamics, SynapseDynamicsSTDP):
+            dynamics.write_stdp_update_region(
+                spec, self.REGIONS.STDP_UPDATES, min(
+                    self._pop_vertex.get_max_atoms_per_core(),
+                    self._pop_vertex.n_atoms))
+
     @overrides(SendsSynapticInputsOverSDRAM.sdram_requirement)
     def sdram_requirement(self, sdram_machine_edge: SDRAMMachineEdge) -> int:
         if isinstance(sdram_machine_edge.post_vertex,
@@ -275,10 +290,14 @@ class PopulationSynapsesMachineVertexCommon(
             self, label: str, x: int, y: int, p: int,
             provenance_data: Sequence[int]) -> None:
         proc_offset = SynapseProvenance.N_ITEMS
+        end_proc_offset = proc_offset + SpikeProcessingFastProvenance.N_ITEMS
         self._parse_synapse_provenance(
             label, x, y, p, provenance_data[:proc_offset])
         self._parse_spike_processing_fast_provenance(
-            label, x, y, p, provenance_data[proc_offset:])
+            label, x, y, p, provenance_data[proc_offset:end_proc_offset])
+        if self._pop_vertex.n_stdp_update_provenance_words:
+            parse_stdp_update_provenance(
+                label, x, y, p, provenance_data[end_proc_offset:])
 
     @abstractmethod
     def _parse_synapse_provenance(

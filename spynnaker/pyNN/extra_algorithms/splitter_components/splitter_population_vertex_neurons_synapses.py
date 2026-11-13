@@ -699,7 +699,8 @@ class SplitterPopulationVertexNeuronsSynapses(
         sdram = MultiRegionSDRAM()
         sdram.merge(self.governed_app_vertex.get_common_constant_sdram(
             n_record,
-            SynapseProvenance.N_ITEMS + SpikeProcessingFastProvenance.N_ITEMS,
+            SynapseProvenance.N_ITEMS + SpikeProcessingFastProvenance.N_ITEMS +
+            self.governed_app_vertex.n_stdp_update_provenance_words,
             PopulationSynapsesMachineVertexLead.COMMON_REGIONS))
 
         sdram.add_cost(
@@ -708,6 +709,9 @@ class SplitterPopulationVertexNeuronsSynapses(
         sdram.add_cost(
             PopulationSynapsesMachineVertexLead.REGIONS.KEY_REGION,
             KEY_CONFIG_SIZE)
+        sdram.add_cost(
+            PopulationSynapsesMachineVertexLead.REGIONS.STDP_UPDATES,
+            self.governed_app_vertex.get_stdp_update_size())
         sdram.nest(
             len(PopulationSynapsesMachineVertexLead.REGIONS) + 1,
             variable_sdram)

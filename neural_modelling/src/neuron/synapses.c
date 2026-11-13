@@ -348,9 +348,13 @@ void synapses_flush_ring_buffers(timer_t time) {
     }
 }
 
-bool synapses_process_synaptic_row(
+static inline bool process_synaptic_row(
         uint32_t time, uint32_t spike_colour, uint32_t colour_mask,
-		synaptic_row_t row, bool *write_back) {
+        synaptic_row_t row, bool *write_back
+#ifdef STDP_NO_SPIKE_UPDATES
+        , uint32_t *cursor
+#endif
+        ) {
 
     // Work out how much delay takes off or adds on to the actual delay because
     // of a delayed spike arrival time, or delayed change of time step in the
@@ -386,8 +390,19 @@ bool synapses_process_synaptic_row(
         // Process any plastic synapses
         profiler_write_entry_disable_fiq(
                 PROFILER_ENTER | PROFILER_PROCESS_PLASTIC_SYNAPSES);
-        if (!synapse_dynamics_process_plastic_synapses(plastic_data,
-                fixed_region, ring_buffers, time, colour_delay, write_back)) {
+        bool ok;
+#ifdef STDP_NO_SPIKE_UPDATES
+        if (cursor != NULL) {
+            ok = synapse_dynamics_process_plastic_synapses_with_cursor(
+                    plastic_data, fixed_region, ring_buffers, time,
+                    colour_delay, cursor, write_back);
+        } else
+#endif
+        {
+            ok = synapse_dynamics_process_plastic_synapses(plastic_data,
+                    fixed_region, ring_buffers, time, colour_delay, write_back);
+        }
+        if (!ok) {
             return false;
         }
         profiler_write_entry_disable_fiq(
@@ -402,6 +417,47 @@ bool synapses_process_synaptic_row(
     //}
 }
 
+bool synapses_process_synaptic_row(
+        uint32_t time, uint32_t spike_colour, uint32_t colour_mask,
+        synaptic_row_t row, bool *write_back) {
+    return process_synaptic_row(time, spike_colour, colour_mask, row, write_back
+#ifdef STDP_NO_SPIKE_UPDATES
+            , NULL
+#endif
+            );
+}
+
+#ifdef STDP_NO_SPIKE_UPDATES
+bool synapses_process_synaptic_row_with_update(
+        uint32_t time, uint32_t spike_colour, uint32_t colour_mask,
+        synaptic_row_t row, synaptic_row_t sdram_row, uint32_t n_bytes,
+        bool *write_back, stdp_update_commit_t *update) {
+    *update = (stdp_update_commit_t) {0};
+    uint32_t cursor;
+    if (!synapse_dynamics_get_update_cursor(row, &cursor)) {
+        return synapses_process_synaptic_row(
+                time, spike_colour, colour_mask, row, write_back);
+    }
+    if (((time - spike_colour) & colour_mask) > time) {
+        // No valid presynaptic timestamp yet; do not activate a new row.
+        return process_synaptic_row(time, spike_colour, colour_mask, row,
+                write_back, &cursor);
+    }
+    synapse_row_fixed_part_t *fixed = synapse_row_fixed_region(row);
+    update->row = stdp_updates_get_row(
+            (uint32_t) sdram_row, n_bytes, colour_mask, cursor,
+            synapse_row_plastic_controls(fixed),
+            synapse_row_num_plastic_controls(fixed));
+    if (update->row == NULL) {
+        log_error("Cannot track STDP row: capacity exhausted or row metadata changed");
+        return false;
+    }
+    update->time = update->row->cursor;
+    return process_synaptic_row(time, spike_colour, colour_mask, row, write_back,
+            &update->time);
+}
+#endif
+
 uint32_t synapses_get_pre_synaptic_events(void) {
     return (num_fixed_pre_synaptic_events +
             synapse_dynamics_get_plastic_pre_synaptic_events());
@@ -411,6 +467,12 @@ void synapses_resume(timer_t time) {
     // If the time has been reset to zero then the ring buffers need to be
     // flushed in case there is a delayed spike left over from a previous run
     if (time == 0) {
+#ifdef STDP_NO_SPIKE_UPDATES
+        if (stdp_updates_enabled) {
+            stdp_updates_reset();
+            synapse_dynamics_reset_post_events();
+        }
+#endif
         for (uint32_t i = 0; i < ring_buffer_size; i++) {
             ring_buffers[i] = 0;
         }

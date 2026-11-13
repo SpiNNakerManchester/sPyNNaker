@@ -325,8 +325,18 @@ static inline void process_current_row(uint32_t time, bool dma_in_progress) {
     bool write_back = false;
     dma_buffer *buffer = &dma_buffers[next_buffer_to_process];
 
-    if (!synapses_process_synaptic_row(time, buffer->colour, buffer->colour_mask,
-    		buffer->row, &write_back)) {
+#ifdef STDP_NO_SPIKE_UPDATES
+    stdp_update_commit_t update = {0};
+    bool ok = synapses_process_synaptic_row_with_update(
+            time, buffer->colour, buffer->colour_mask, buffer->row,
+            buffer->sdram_writeback_address, buffer->n_bytes_transferred,
+            &write_back, &update);
+#else
+    bool ok = synapses_process_synaptic_row(
+            time, buffer->colour, buffer->colour_mask, buffer->row,
+            &write_back);
+#endif
+    if (!ok) {
         handle_row_error(buffer);
     }
     synaptogenesis_spike_received(time, buffer->originating_spike);
@@ -345,11 +355,41 @@ static inline void process_current_row(uint32_t time, bool dma_in_progress) {
         // as otherwise the next wait will fail!
         if (!dma_in_progress) {
             wait_for_dma_to_complete();
+#ifdef STDP_NO_SPIKE_UPDATES
+            stdp_updates_commit(update);
+#endif
         }
     }
     next_buffer_to_process = (next_buffer_to_process + 1) & DMA_BUFFER_MOD_MASK;
     spikes_processed_this_time_step++;
 }
+
+#ifdef STDP_NO_SPIKE_UPDATES
+//! Run one low-priority update between spike transfers. There is no prefetch
+//! in flight, and this function waits for the weight write before returning.
+static void do_stdp_update(uint32_t time) {
+    stdp_update_commit_t update = stdp_updates_next(time);
+    if (update.row == NULL) {
+        return;
+    }
+    synaptic_row_t sdram_row = (synaptic_row_t) update.row->address;
+    synaptic_row_t row = dma_buffers[0].row;
+    do_fast_dma_read(sdram_row, row, update.row->n_bytes);
+    if (!wait_for_dma_to_complete_or_end()) {
+        return;
+    }
+    dma_complete_count++;
+    uint32_t cursor = update.row->cursor;
+    if (synapse_dynamics_update_without_spike(row, update.time, &cursor)) {
+        do_fast_dma_write(synapse_row_plastic_region(row),
+                synapse_row_plastic_region(sdram_row),
+                synapse_row_plastic_size(row) * sizeof(uint32_t));
+        wait_for_dma_to_complete();
+        update.time = cursor;
+        stdp_updates_commit(update);
+    }
+}
+#endif
 
 //! \brief Store data for provenance and recordings
 //! \param[in] time The time step of the simulation
@@ -509,6 +549,9 @@ void spike_processing_fast_time_step_loop(uint32_t time, uint32_t n_rewires) {
 
     // Do rewiring
     do_rewiring(time, n_rewires);
+#ifdef STDP_NO_SPIKE_UPDATES
+    stdp_updates_begin_timestep(time);
+#endif
 
     // Loop until the end of a time step is reached
     while (true) {
@@ -516,6 +559,12 @@ void spike_processing_fast_time_step_loop(uint32_t time, uint32_t n_rewires) {
         // Wait for a spike, or the timer to expire
         uint32_t spike;
         while (!is_end_of_time_step() && !get_next_spike(time, &spike)) {
+#ifdef STDP_NO_SPIKE_UPDATES
+            if (in_spikes_size() == 0 &&
+                    tc[T2_COUNT] > clocks_to_transfer) {
+                do_stdp_update(time);
+            }
+#endif
             // This doesn't wait for interrupt currently because there isn't
             // a way to have a T2 interrupt without a callback function, and
             // a callback function is too slow!  This is therefore a busy wait.
@@ -541,6 +590,21 @@ void spike_processing_fast_time_step_loop(uint32_t time, uint32_t n_rewires) {
                         time, (spike & key_config.spike_id_mask) >> key_config.colour_shift);
             }
 
+#ifdef STDP_NO_SPIKE_UPDATES
+            // Do not read the same row into another buffer before its
+            // weights and cursor have both been committed.
+            if (!wait_for_dma_to_complete_or_end()) {
+                count_input_buffer_packets_late += 1;
+                break;
+            }
+            dma_complete_count++;
+            process_current_row(time, false);
+            dma_in_progress = !is_end_of_time_step() &&
+                    get_next_dma(time, &spike, &result);
+            if (dma_in_progress) {
+                read_synaptic_row(spike, &result);
+            }
+#else
             // See if there is another DMA to do
             dma_in_progress = get_next_dma(time, &spike, &result);
 
@@ -556,6 +620,7 @@ void spike_processing_fast_time_step_loop(uint32_t time, uint32_t n_rewires) {
 
             // Process the row we already have while the DMA progresses
             process_current_row(time, dma_in_progress);
+#endif
 
         }
 

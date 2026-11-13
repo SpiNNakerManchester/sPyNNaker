@@ -69,4 +69,12 @@ bool spike_processing_do_rewiring(int number_of_rewires);
 //! \param[in] time: The current timestep
 void spike_processing_clear_input_buffer(timer_t time);
 
+#ifdef STDP_NO_SPIKE_UPDATES
+//! Make weight-only work eligible after the neuron update for this tick.
+void spike_processing_do_stdp_updates(timer_t local_time);
+
+//! Finish the current write, if any, before reporting a simulation pause.
+void spike_processing_pause_stdp_updates(void);
+#endif
+
 #endif // _SPIKE_PROCESSING_H_

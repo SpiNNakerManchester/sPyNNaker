@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 import math
+import operator
 from collections.abc import Iterable
 from typing import TYPE_CHECKING
 
@@ -77,6 +78,14 @@ if TYPE_CHECKING:
 # How large are the time-stamps stored with each event
 TIME_STAMP_BYTES = BYTES_PER_WORD
 
+# Layout of stdp_update_region_t in the firmware. Only the lead and shared
+# synapse cores' configuration is common; their row registries are private.
+_UPDATE_HEADER_WORDS = 2
+_UPDATE_ROW_WORDS = 4
+_UPDATE_POST_WORDS = 4
+_UPDATE_TARGET_BYTES = 6
+_MAX_UPDATE_CAPACITY = 16384
+
 # The targets of neuromodulation
 NEUROMODULATION_TARGETS = {
     "reward": 0,
@@ -99,6 +108,8 @@ class SynapseDynamicsSTDP(
         "__dendritic_delay_fraction",
         # The neuromodulation instance if enabled
         "__neuromodulation",
+        "__no_spike_update_capacity",
+        "__no_spike_updates_per_timestep",
         # padding to add to a synaptic row for synaptic rewiring
         "__pad_to_length",
         # timing dependence to use for the STDP rule
@@ -114,7 +125,9 @@ class SynapseDynamicsSTDP(
             dendritic_delay_fraction: float = 1.0,
             weight: _In_Types = StaticSynapse.default_parameters['weight'],
             delay: _In_Types = None, pad_to_length: int | None = None,
-            backprop_delay: bool = True):
+            backprop_delay: bool = True,
+            no_spike_updates_per_timestep: int = 0,
+            no_spike_update_capacity: int = 1024):
         """
         :param timing_dependence:
         :param weight_dependence:
@@ -124,6 +137,25 @@ class SynapseDynamicsSTDP(
         :param delay: Use ``None`` to get the simulator default minimum delay.
         :param pad_to_length:
         :param backprop_delay:
+        :param no_spike_updates_per_timestep:
+            Maximum active rows considered for a weight-only update per
+            time step. Zero retains the normal pre-spike-only behaviour.
+        :param no_spike_update_capacity:
+            Maximum number of active rows tracked per synapse core. Must be
+            a power of two between 1 and 16384. Exceeding it fails the run.
+
+        .. note::
+            Only rows that have received a presynaptic spike are tracked.
+            Updates are attempted when the core has spare time. When a post
+            history reaches 12 of its 15 events, rows still needing any of
+            its oldest events are given priority over the round-robin sweep.
+            Each update stays behind the oldest timestamp that could still
+            arrive, as determined by the source's colour bits. Large delays,
+            high firing rates or a low update budget can still exhaust the
+            post history. Check the STDP provenance for incomplete windows.
+            More frequent writes can change fixed-point rounding, especially
+            when neuromodulation is enabled. Structural plasticity is not
+            supported with this option.
         """
         if timing_dependence is None or weight_dependence is None:
             raise NotImplementedError(
@@ -143,6 +175,19 @@ class SynapseDynamicsSTDP(
         self.__pad_to_length = pad_to_length
         self.__backprop_delay = backprop_delay
         self.__neuromodulation: SynapseDynamicsNeuromodulation | None = None
+        budget = operator.index(no_spike_updates_per_timestep)
+        capacity = operator.index(no_spike_update_capacity)
+        if (capacity < 1 or capacity > _MAX_UPDATE_CAPACITY or
+                capacity & (capacity - 1)):
+            raise ValueError(
+                "no_spike_update_capacity must be a power of two "
+                f"between 1 and {_MAX_UPDATE_CAPACITY}")
+        if not 0 <= budget <= capacity:
+            raise ValueError(
+                "no_spike_updates_per_timestep must be between zero "
+                "and no_spike_update_capacity")
+        self.__no_spike_updates_per_timestep = budget
+        self.__no_spike_update_capacity = capacity if budget else 0
 
         if self.__dendritic_delay_fraction != 1.0:
             raise NotImplementedError("All delays must be dendritic!")
@@ -194,6 +239,10 @@ class SynapseDynamicsSTDP(
             SynapseDynamicsStructuralSTDP,
         )
         if isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
+            if self.__no_spike_updates_per_timestep:
+                raise SynapticConfigurationException(
+                    "No-spike STDP updates are not supported with "
+                    "structural plasticity")
             return SynapseDynamicsStructuralSTDP(
                 synapse_dynamics.partner_selection, synapse_dynamics.formation,
                 synapse_dynamics.elimination,
@@ -279,7 +328,43 @@ class SynapseDynamicsSTDP(
             self.__weight_dependence.is_same_as(
                 synapse_dynamics.weight_dependence) and
             (self.__dendritic_delay_fraction ==
-             synapse_dynamics.dendritic_delay_fraction))
+             synapse_dynamics.dendritic_delay_fraction) and
+            (self.__no_spike_updates_per_timestep ==
+             synapse_dynamics.__no_spike_updates_per_timestep) and
+            (self.__no_spike_update_capacity ==
+             synapse_dynamics.__no_spike_update_capacity))
+
+    @property
+    def no_spike_updates_enabled(self) -> bool:
+        """Whether this model uses the no-spike update firmware."""
+        return bool(self.__no_spike_updates_per_timestep)
+
+    def get_stdp_update_size(self, n_atoms: int) -> int:
+        """
+        :param n_atoms: Maximum number of post neurons on the synapse core.
+        :returns: SDRAM bytes for a single core's no-spike update registry.
+        """
+        if not self.no_spike_updates_enabled:
+            return 0
+        # Two half-word hash slots per row and a reverse link for each
+        # possible (active row, post neuron) pair. Round up to a word.
+        capacity = self.__no_spike_update_capacity
+        link_words = (capacity * n_atoms * _UPDATE_TARGET_BYTES +
+                      BYTES_PER_WORD - 1) // BYTES_PER_WORD
+        return BYTES_PER_WORD * (
+            _UPDATE_HEADER_WORDS + _UPDATE_POST_WORDS * n_atoms +
+            (1 + _UPDATE_ROW_WORDS) * capacity + link_words)
+
+    def write_stdp_update_region(
+            self, spec: DataSpecificationBase, region: int,
+            n_atoms: int) -> None:
+        """Allocate a private region and write its two configuration words."""
+        size = self.get_stdp_update_size(n_atoms)
+        if size:
+            spec.reserve_memory_region(region, size, label="STDP updates")
+            spec.switch_write_focus(region)
+            spec.write_value(self.__no_spike_updates_per_timestep)
+            spec.write_value(self.__no_spike_update_capacity)
 
     def get_vertex_executable_suffix(self) -> str:
         """
@@ -297,6 +382,8 @@ class SynapseDynamicsSTDP(
         else:
             name = "_stdp_mad_"
         name += timing_suffix + "_" + weight_suffix
+        if self.__no_spike_updates_per_timestep:
+            name += "_no_spike_updates"
         return name
 
     def get_parameters_sdram_usage_in_bytes(

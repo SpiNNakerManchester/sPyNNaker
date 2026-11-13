@@ -184,6 +184,10 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
 
         # If the dynamics is STDP but not Structural (as here), merge
         if isinstance(synapse_dynamics, SynapseDynamicsSTDP):
+            if synapse_dynamics.no_spike_updates_enabled:
+                raise SynapticConfigurationException(
+                    "No-spike STDP updates are not supported with "
+                    "structural plasticity")
             return SynapseDynamicsStructuralSTDP(
                 self.partner_selection, self.formation,
                 self.elimination,
